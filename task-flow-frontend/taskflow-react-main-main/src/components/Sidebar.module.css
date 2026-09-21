@@ -1,0 +1,155 @@
+/* ── SIDEBAR ───────────────────────────────────────────── */
+
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+
+  display: flex;
+  flex-direction: column;
+  gap: 35px;
+
+  width: 235px;
+  min-height: 100vh;
+
+  padding: 28px 18px;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(20, 27, 48, 0.96),
+      rgba(8, 11, 22, 0.98)
+    );
+
+  border-right: 1px solid var(--border);
+
+  box-shadow:
+    15px 0 40px rgba(0, 0, 0, 0.15);
+}
+
+
+/* ── LOGO ──────────────────────────────────────────────── */
+
+.logo h1 {
+  background:
+    linear-gradient(
+      90deg,
+      var(--primary-light),
+      var(--cyan)
+    );
+
+  background-clip: text;
+  -webkit-background-clip: text;
+
+  color: transparent;
+
+  font-size: 36px;
+  font-weight: 800;
+}
+
+
+/* ── NAVEGAÇÃO ─────────────────────────────────────────── */
+
+.nav {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+
+/* ── LINKS ─────────────────────────────────────────────── */
+
+.link {
+  position: relative;
+
+  padding: 11px 14px;
+
+  color: var(--text-secondary);
+
+  text-decoration: none;
+
+  border-radius: 10px;
+
+  font-size: 0.92rem;
+
+  transition: 0.25s ease;
+}
+
+
+/* ── HOVER ─────────────────────────────────────────────── */
+
+.link:hover {
+  background: rgba(139, 92, 246, 0.08);
+
+  color: var(--text);
+
+  transform: translateX(3px);
+}
+
+
+/* ── LINK ATIVO ────────────────────────────────────────── */
+
+.ativo {
+  background:
+    linear-gradient(
+      90deg,
+      rgba(139, 92, 246, 0.22),
+      rgba(139, 92, 246, 0.06)
+    );
+
+  color: #ffffff;
+
+  border: 1px solid rgba(139, 92, 246, 0.18);
+
+  font-weight: 700;
+}
+
+
+/* ── INDICADOR DO LINK ATIVO ───────────────────────────── */
+
+.ativo::before {
+  content: '';
+
+  position: absolute;
+
+  left: -1px;
+  top: 25%;
+
+  width: 3px;
+  height: 50%;
+
+  background: var(--primary);
+
+  border-radius: 5px;
+}
+
+
+/* ── BOTÕES ────────────────────────────────────────────── */
+
+button {
+  padding: 7px 13px;
+
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-secondary);
+
+  border: 1px solid var(--border);
+  border-radius: 9px;
+
+  cursor: pointer;
+
+  transition: 0.25s ease;
+}
+
+
+/* ── HOVER DOS BOTÕES ──────────────────────────────────── */
+
+button:hover {
+  background: var(--primary);
+
+  color: white;
+
+  border-color: var(--primary);
+
+  box-shadow:
+    0 5px 20px rgba(139, 92, 246, 0.25);
+}

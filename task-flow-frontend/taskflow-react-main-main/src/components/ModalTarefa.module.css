@@ -1,0 +1,138 @@
+/* ── OVERLAY ───────────────────────────────────────────── */
+
+.overlay {
+  position: fixed;
+  inset: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: rgba(2, 6, 23, 0.75);
+
+  backdrop-filter: blur(5px);
+
+  z-index: 100;
+}
+
+
+/* ── CARD ──────────────────────────────────────────────── */
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+
+  width: 100%;
+  max-width: 420px;
+
+  padding: 28px 32px;
+
+  background-color: #1e293b;
+  color: #f8fafc;
+
+  border: 1px solid #475569;
+  border-radius: 14px;
+
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+}
+
+
+/* ── TÍTULO ───────────────────────────────────────────── */
+
+.card h2 {
+  color: #a78bfa;
+
+  font-size: 1.2rem;
+}
+
+
+/* ── CAMPOS ───────────────────────────────────────────── */
+
+.card input,
+.card select {
+  padding: 10px 14px;
+
+  background-color: #f8fafc;
+  color: #1e293b;
+
+  border: 1px solid #475569;
+  border-radius: 10px;
+
+  font-family: inherit;
+  font-size: 1rem;
+
+  outline: none;
+}
+
+
+/* ── FOCO ─────────────────────────────────────────────── */
+
+.card input:focus,
+.card select:focus {
+  border-color: #22d3ee;
+  box-shadow: 0 0 0 2px rgba(34, 211, 238, 0.15);
+}
+
+
+/* ── CIDADE ────────────────────────────────────────────── */
+
+.cidade {
+  color: #94a3b8;
+
+  font-size: 0.8rem;
+}
+
+
+/* ── BOTÕES ────────────────────────────────────────────── */
+
+.botoes {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+
+/* ── BOTÃO CANCELAR ────────────────────────────────────── */
+
+.botoes button:first-child {
+  padding: 9px 18px;
+
+  background: transparent;
+  color: #94a3b8;
+
+  border: 1px solid #475569;
+  border-radius: 8px;
+
+  cursor: pointer;
+
+  transition: 0.2s;
+}
+
+.botoes button:first-child:hover {
+  background-color: #334155;
+  color: #f8fafc;
+}
+
+
+/* ── BOTÃO CONFIRMAR ───────────────────────────────────── */
+
+.botoes button:last-child {
+  padding: 9px 18px;
+
+  background-color: #7c3aed;
+  color: #ffffff;
+
+  border: none;
+  border-radius: 8px;
+
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition: 0.2s;
+}
+
+.botoes button:last-child:hover {
+  background-color: #6d28d9;
+}

@@ -1,0 +1,273 @@
+/* ── RESET ─────────────────────────────────────────────── */
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+
+/* ── VARIÁVEIS ─────────────────────────────────────────── */
+
+:root {
+  --bg: #080b16;
+  --bg-secondary: #0d1222;
+
+  --surface: rgba(20, 27, 48, 0.82);
+  --surface-light: rgba(30, 39, 66, 0.75);
+
+  --primary: #8b5cf6;
+  --primary-light: #a78bfa;
+
+  --cyan: #22d3ee;
+
+  --text: #f8fafc;
+  --text-secondary: #a8b1c7;
+  --text-muted: #68738d;
+
+  --border: rgba(148, 163, 184, 0.14);
+
+  --high: #fb7185;
+  --medium: #fbbf24;
+  --low: #34d399;
+}
+
+
+/* ── BASE ──────────────────────────────────────────────── */
+
+body {
+  min-height: 100vh;
+
+  background:
+    radial-gradient(
+      circle at 10% 10%,
+      rgba(139, 92, 246, 0.12),
+      transparent 30%
+    ),
+    radial-gradient(
+      circle at 90% 80%,
+      rgba(34, 211, 238, 0.08),
+      transparent 30%
+    ),
+    var(--bg);
+
+  color: var(--text);
+
+  font-family: 'Inter', Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+
+  display: flex;
+  flex-direction: column;
+}
+
+
+/* ── CONTAINER ─────────────────────────────────────────── */
+
+.container {
+  width: 100%;
+  max-width: 1100px;
+
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+
+/* ── MAIN ──────────────────────────────────────────────── */
+
+main {
+  flex: 1;
+  padding: 40px 0;
+}
+
+
+/* ── MENSAGEM VAZIA ───────────────────────────────────── */
+
+.msg-vazia {
+  margin: 25px 0;
+  padding: 20px;
+
+  color: var(--text-muted);
+
+  text-align: center;
+
+  background: rgba(255, 255, 255, 0.02);
+
+  border: 1px dashed var(--border);
+  border-radius: 14px;
+}
+
+
+/* ── FILTROS ───────────────────────────────────────────── */
+
+.filtro-prioridade {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+
+  margin: 20px 0;
+}
+
+
+/* ── BOTÕES DE FILTRO ──────────────────────────────────── */
+
+.btn-filtro {
+  padding: 7px 14px;
+
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-secondary);
+
+  border: 1px solid var(--border);
+  border-radius: 20px;
+
+  cursor: pointer;
+
+  transition: 0.25s ease;
+}
+
+.btn-filtro:hover {
+  background: rgba(139, 92, 246, 0.18);
+  color: var(--primary-light);
+
+  border-color: rgba(139, 92, 246, 0.4);
+
+  transform: translateY(-1px);
+}
+
+
+/* ── INPUT ─────────────────────────────────────────────── */
+
+input {
+  flex: 1;
+
+  padding: 12px 15px;
+
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text);
+
+  border: 1px solid var(--border);
+  border-radius: 12px;
+
+  outline: none;
+
+  transition: 0.25s ease;
+}
+
+input::placeholder {
+  color: var(--text-muted);
+}
+
+input:focus {
+  border-color: var(--primary);
+
+  box-shadow:
+    0 0 0 3px rgba(139, 92, 246, 0.12);
+}
+
+
+/* ── FOOTER ────────────────────────────────────────────── */
+
+footer {
+  padding: 24px;
+
+  color: var(--text-muted);
+
+  text-align: center;
+
+  border-top: 1px solid var(--border);
+}
+
+
+/* ── KANBAN ────────────────────────────────────────────── */
+
+.kanban-quadro {
+  display: flex;
+  align-items: flex-start;
+  gap: 18px;
+
+  margin-top: 28px;
+  padding-bottom: 30px;
+
+  overflow-x: auto;
+}
+
+
+/* ── COLUNA ────────────────────────────────────────────── */
+
+.kanban-coluna {
+  flex: 1;
+  min-width: 260px;
+
+  padding: 16px;
+
+  background: var(--surface);
+
+  border: 1px solid var(--border);
+  border-radius: 18px;
+
+  backdrop-filter: blur(14px);
+
+  box-shadow:
+    0 15px 40px rgba(0, 0, 0, 0.18);
+}
+
+
+/* ── CABEÇALHO DA COLUNA ───────────────────────────────── */
+
+.kanban-coluna-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  margin-bottom: 15px;
+  padding-bottom: 12px;
+
+  border-bottom: 1px solid var(--border);
+}
+
+
+/* ── TÍTULO DA COLUNA ──────────────────────────────────── */
+
+.kanban-coluna-header h3 {
+  color: var(--text);
+
+  font-size: 0.78rem;
+  font-weight: 700;
+
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+
+/* ── CONTADOR ──────────────────────────────────────────── */
+
+.kanban-contador {
+  min-width: 28px;
+
+  padding: 3px 8px;
+
+  background: rgba(139, 92, 246, 0.16);
+  color: var(--primary-light);
+
+  border: 1px solid rgba(139, 92, 246, 0.2);
+  border-radius: 20px;
+
+  font-size: 0.7rem;
+  font-weight: 700;
+
+  text-align: center;
+}
+
+
+/* ── LISTA ─────────────────────────────────────────────── */
+
+.kanban-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  min-height: 70px;
+
+  list-style: none;
+}

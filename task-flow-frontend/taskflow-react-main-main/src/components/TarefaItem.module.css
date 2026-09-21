@@ -1,0 +1,177 @@
+/* ── TAREFA ────────────────────────────────────────────── */
+
+.tarefa {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 10px;
+
+  min-width: 0;
+
+  margin-bottom: 8px;
+  padding: 12px 18px;
+
+  background-color: #334155;
+  color: #f8fafc;
+
+  border: 1px solid #475569;
+  border-radius: 10px;
+
+  list-style: none;
+
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.tarefa:hover {
+  border-color: #64748b;
+  transform: translateY(-1px);
+}
+
+
+/* ── CONTEÚDO ──────────────────────────────────────────── */
+
+.conteudo {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+
+  width: 100%;
+  min-width: 0;
+}
+
+
+/* ── TEXTO DA TAREFA ───────────────────────────────────── */
+
+.textoTarefa {
+  color: #f8fafc;
+
+  font-size: 1rem;
+
+  cursor: pointer;
+
+  word-break: break-word;
+}
+
+
+/* ── CIDADE ────────────────────────────────────────────── */
+
+.cidade {
+  color: #94a3b8;
+
+  font-size: 0.75rem;
+}
+
+
+/* ── AÇÕES ─────────────────────────────────────────────── */
+
+.acoes {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  flex-shrink: 0;
+}
+
+
+/* ── BADGE DE PRIORIDADE ───────────────────────────────── */
+
+.badge-prioridade {
+  padding: 4px 10px;
+
+  border-radius: 12px;
+
+  font-size: 12px;
+  font-weight: 600;
+
+  letter-spacing: 0.05em;
+}
+
+
+/* ── BOTÕES DE AÇÃO ────────────────────────────────────── */
+
+.btnDeletar,
+.btnMover {
+  padding: 3px 8px;
+
+  background: transparent;
+  color: #94a3b8;
+
+  border: 1px solid #64748b;
+  border-radius: 6px;
+
+  cursor: pointer;
+
+  transition: 0.2s;
+}
+
+
+/* ── HOVER DOS BOTÕES ──────────────────────────────────── */
+
+.btnDeletar:hover,
+.btnMover:hover {
+  background-color: #7c3aed;
+
+  color: #ffffff;
+
+  border-color: #7c3aed;
+}
+
+
+/* ── TAREFA CONCLUÍDA ──────────────────────────────────── */
+
+.concluida {
+  opacity: 0.45;
+}
+
+
+/* ── PRIORIDADE ALTA ───────────────────────────────────── */
+
+.alta {
+  color: #ffffff;
+
+  border-left: 5px solid #ef4444;
+}
+
+
+/* ── PRIORIDADE MÉDIA ──────────────────────────────────── */
+
+.media {
+  color: #ffffff;
+
+  border-left: 5px solid #f59e0b;
+}
+
+
+/* ── PRIORIDADE BAIXA ──────────────────────────────────── */
+
+.baixa {
+  color: #ffffff;
+
+  border-left: 5px solid #22c55e;
+}
+
+
+/* ── BADGE ALTA ────────────────────────────────────────── */
+
+.badge-alta {
+  background-color: #ef4444;
+  color: #ffffff;
+}
+
+
+/* ── BADGE MÉDIA ───────────────────────────────────────── */
+
+.badge-media {
+  background-color: #f59e0b;
+  color: #1e293b;
+}
+
+
+/* ── BADGE BAIXA ───────────────────────────────────────── */
+
+.badge-baixa {
+  background-color: #22c55e;
+  color: #052e16;
+}

@@ -1,0 +1,186 @@
+/* ── RESET ─────────────────────────────────────────────── */
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+
+/* ── BASE ──────────────────────────────────────────────── */
+
+body {
+  background-color: #36445d;
+  color: white;
+  font-family: 'Inter', Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  min-height: 100vh;
+
+  display: flex;
+  flex-direction: column;
+}
+
+
+/* ── CONTAINER ─────────────────────────────────────────── */
+
+.container {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+
+/* ── MAIN ──────────────────────────────────────────────── */
+
+main {
+  flex: 1;
+  padding: 28px 0;
+}
+
+
+/* ── MENSAGEM VAZIA ───────────────────────────────────── */
+
+.msg-vazia {
+  color: #94a3b8;
+  margin: 20px 0 30px;
+  padding: 0 23px;
+}
+
+
+/* ── FILTROS ──────────────────────────────────────────── */
+
+.filtro-prioridade {
+  display: flex;
+  gap: 5px;
+  margin: 10px;
+  color: #94a3b8;
+}
+
+
+/* ── BOTÃO DE FILTRO ───────────────────────────────────── */
+
+.btn-filtro {
+  border: none;
+  border-radius: 8px;
+  padding: 5px;
+  background-color: #03627e;
+  color: #eddee0;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.btn-filtro:hover {
+  background-color: #94a3b8;
+  color: #03627e;
+}
+
+
+/* ── FORMULÁRIO ────────────────────────────────────────── */
+
+input {
+  flex: 1;
+  border: none;
+  border-radius: 10px;
+  margin: 0;
+  padding: 10px;
+
+  background-color: #eddee0;
+  color: #dc8079;
+}
+
+input:focus {
+  outline: 2px solid #dc8079;
+}
+
+
+/* ── FOOTER ────────────────────────────────────────────── */
+
+footer {
+  padding: 16px;
+  text-align: center;
+  color: #94a3b8;
+}
+
+
+/* ── ESTRUTURA KANBAN ─────────────────────────────────── */
+
+.kanban-quadro {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+
+  margin-top: 24px;
+  padding-bottom: 32px;
+
+  overflow-x: auto;
+}
+
+
+/* ── COLUNA INDIVIDUAL ─────────────────────────────────── */
+
+.kanban-coluna {
+  flex: 1;
+  min-width: 200px;
+
+  padding: 12px;
+
+  background-color: #0e4e63;
+  border: 1px solid #dc8079;
+  border-radius: 8px;
+}
+
+
+/* ── CABEÇALHO DA COLUNA ──────────────────────────────── */
+
+.kanban-coluna-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+
+  border-bottom: 1px solid #dc8079;
+}
+
+
+/* ── TÍTULO DA COLUNA ──────────────────────────────────── */
+
+.kanban-coluna-header h3 {
+  color: #dc8079;
+
+  font-size: 0.8rem;
+  font-weight: 700;
+
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+
+/* ── CONTADOR DE TAREFAS ───────────────────────────────── */
+
+.kanban-contador {
+  padding: 1px 7px;
+
+  background-color: #94a3b8;
+  color: #eddee0;
+
+  border-radius: 10px;
+
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+
+/* ── LISTA DE TAREFAS ──────────────────────────────────── */
+
+.kanban-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  min-height: 60px;
+
+  list-style: none;
+}
