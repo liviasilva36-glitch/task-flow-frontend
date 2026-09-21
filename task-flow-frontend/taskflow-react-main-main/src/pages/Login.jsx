@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import "./Login.css";
 
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3001";
+
 function Login() {
   const [email, setEmail] = useState("admin@taskflow.com");
   const [senha, setSenha] = useState("1234");
@@ -20,7 +22,7 @@ function Login() {
 
     try {
       const resposta = await fetch(
-        "http://localhost:3001/auth/login",
+        `${API_URL}/auth/login`,
         {
           method: "POST",
 
