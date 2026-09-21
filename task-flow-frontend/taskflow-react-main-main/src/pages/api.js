@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://localhost:3001', // Porta em que a taskflow-api está rodando
+  baseURL: import.meta.env.VITE_URL_BASE_API, // Porta em que a taskflow-api está rodando
 });
 
 api.interceptors.request.use(
