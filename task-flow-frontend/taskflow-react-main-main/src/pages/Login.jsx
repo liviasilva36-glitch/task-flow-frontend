@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import "./Login.css";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3001";
+const API_URL = "https://task-flow-node-bxz3.vercel.app";
 
 function Login() {
   const [email, setEmail] = useState("admin@taskflow.com");
