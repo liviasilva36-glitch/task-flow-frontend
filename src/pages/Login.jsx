@@ -2,8 +2,9 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import "./Login.css";
+import api from "./api";
 
-const API_URL = "https://task-flow-node.vercel.app";
+
 
 function Login() {
 const [email, setEmail] = useState("admin@taskflow.com");
@@ -21,30 +22,31 @@ setErro("");
 setCarregando(true);
 
 try {
-  const resposta = await fetch(
-    API_URL + "/auth/login",
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        email: email.trim(),
-        senha: senha.trim()
-      })
-    }
-  );
 
-  const dados = await resposta.json();
-
-  if (!resposta.ok) {
-    setErro(
-      dados.erro || "E-mail ou senha inválidos."
-    );
-    return;
+const resposta = await api.post('/auth/login',
+  {
+    email,
+    senha
   }
+)
 
-  login(dados.usuario, dados.token);
+  // const resposta = await fetch(
+  //   API_URL + "/auth/login",
+  //   {
+  //     method: "POST",
+  //     headers: {
+  //       "Content-Type": "application/json"
+  //     },
+  //     body: JSON.stringify({
+  //       email: email.trim(),
+  //       senha: senha.trim()
+  //     })
+  //   }
+  // );
+
+  //const dados = await resposta.json();
+
+ login(resposta.data.usuario, resposta.data.token);
 
   navigate("/");
 } catch (error) {

@@ -7,6 +7,8 @@ import ListaTarefas from './ListaTarefas';
 import { useState, useEffect } from 'react';
 import ModalTarefa from './ModalTarefa';
 import axios from 'axios';
+import api from '../pages/api';
+
 
 // =============================================================
 // 1. ESTADO DA APLICAÇÃO
@@ -40,7 +42,9 @@ function TarefaV1() {
         setCarregando(true);
         setErro('');
 
-        const resposta = await axios.get(URL_API);
+        // const resposta = await axios.get(URL_API);
+
+        const resposta = await api.get('/tarefas');
 
         setTarefas(resposta.data);
 
