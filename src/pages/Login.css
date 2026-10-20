@@ -675,7 +675,180 @@
     min-height: 48px;
   }
 }
+/* Layout Principal */
+.kanban-container {
+  padding: 24px;
+  max-width: 1100px;
+  margin: 0 auto;
+  font-family: system-ui, -apple-system, sans-serif;
+}
 
+.kanban-titulo {
+  color: #1e293b;
+  margin-bottom: 20px;
+  font-size: 1.8rem;
+}
+
+/* Alerta de Erro */
+.kanban-erro {
+  background-color: #fee2e2;
+  color: #991b1b;
+  border: 1px solid #f87171;
+  padding: 12px;
+  border-radius: 6px;
+  margin-bottom: 20px;
+}
+
+/* Formulário de Nova Tarefa */
+.kanban-form {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 28px;
+  background-color: #f8fafc;
+  padding: 16px;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.kanban-input {
+  flex: 1;
+  padding: 10px 14px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.kanban-select {
+  padding: 10px 14px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  background-color: white;
+  font-size: 14px;
+}
+
+.kanban-btn-adicionar {
+  background-color: #2563eb;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.kanban-btn-adicionar:hover {
+  background-color: #1d4ed8;
+}
+
+/* Quadro e Colunas */
+.kanban-grid {
+  display: flex;
+  gap: 20px;
+}
+
+.kanban-coluna {
+  flex: 1;
+  background-color: #f1f5f9;
+  padding: 16px;
+  border-radius: 10px;
+  min-height: 400px;
+}
+
+.kanban-coluna-titulo {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #334155;
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #cbd5e1;
+}
+
+/* Card da Tarefa */
+.kanban-card {
+  background-color: white;
+  padding: 14px;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+  border-left: 5px solid #cbd5e1; /* Borda padrão */
+}
+
+/* Indicadores de Prioridade (Cores) */
+.kanban-card.prioridade-alta {
+  border-left-color: #ef4444; /* Vermelho */
+}
+
+.kanban-card.prioridade-media {
+  border-left-color: #f59e0b; /* Amarelo */
+}
+
+.kanban-card.prioridade-baixa {
+  border-left-color: #10b981; /* Verde */
+}
+
+.kanban-card-texto {
+  margin: 0 0 12px 0;
+  font-size: 15px;
+  color: #0f172a;
+}
+
+.kanban-card-rodape {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  margin-bottom: 12px;
+}
+
+.kanban-badge {
+  text-transform: uppercase;
+  font-weight: 700;
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.kanban-badge.alta { background: #fee2e2; color: #991b1b; }
+.kanban-badge.media { background: #fef3c7; color: #92400e; }
+.kanban-badge.baixa { background: #d1fae5; color: #065f46; }
+
+.kanban-btn-remover {
+  background: transparent;
+  color: #ef4444;
+  border: 1px solid #fca5a5;
+  padding: 3px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 11px;
+}
+
+.kanban-btn-remover:hover {
+  background: #fee2e2;
+}
+
+/* Ações de Transição */
+.kanban-card-acoes {
+  display: flex;
+  gap: 6px;
+  padding-top: 8px;
+  border-top: 1px solid #f1f5f9;
+}
+
+.kanban-btn-mover {
+  flex: 1;
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  padding: 4px;
+  border-radius: 4px;
+  font-size: 11px;
+  cursor: pointer;
+  color: #475569;
+}
+
+.kanban-btn-mover:hover {
+  background-color: #e2e8f0;
+}
 
 /* =========================================================
    REDUÇÃO DE MOVIMENTO

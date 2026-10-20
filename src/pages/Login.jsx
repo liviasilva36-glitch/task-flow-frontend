@@ -2,125 +2,86 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import "./Login.css";
-import api from "./api";
-
+import api, { mensagensDeErro } from "./api"; // 1. Importação com chaves conforme instruído
 
 
 function Login() {
-const [email, setEmail] = useState("admin@taskflow.com");
-const [senha, setSenha] = useState("1234");
-const [erro, setErro] = useState("");
-const [carregando, setCarregando] = useState(false);
+  const [email, setEmail] = useState("admin@taskflow.com");
+  const [senha, setSenha] = useState("1234");
+  const [erro, setErro] = useState("");
+  const [carregando, setCarregando] = useState(false);
 
-const { login } = useAuth();
-const navigate = useNavigate();
+  const { login } = useAuth();
+  const navigate = useNavigate();
 
-async function handleLogin(event) {
-event.preventDefault();
+  async function handleLogin(event) {
+    event.preventDefault();
 
-setErro("");
-setCarregando(true);
+    setErro("");
+    setCarregando(true);
 
-try {
+    try {
+      const resposta = await api.post("/auth/login", {
+        email: email.trim(),
+        senha: senha.trim()
+      });
 
-const resposta = await api.post('/auth/login',
-  {
-    email,
-    senha
+      login(resposta.data.usuario, resposta.data.token);
+      navigate("/");
+    } catch (error) {
+      console.error("Erro ao conectar:", error);
+
+      // 2. Extrai o array de mensagens usando a função utilitária do prof
+      const mensagens = mensagensDeErro(error);
+      
+      // Concatena as mensagens caso haja mais de uma (ex: erros de validação por campo)
+      setErro(mensagens.join(" "));
+    } finally {
+      setCarregando(false);
+    }
   }
-)
 
-  // const resposta = await fetch(
-  //   API_URL + "/auth/login",
-  //   {
-  //     method: "POST",
-  //     headers: {
-  //       "Content-Type": "application/json"
-  //     },
-  //     body: JSON.stringify({
-  //       email: email.trim(),
-  //       senha: senha.trim()
-  //     })
-  //   }
-  // );
+  return (
+    <div className="login-container">
+      <div className="login-card">
+        <h1 className="login-logo">TaskFlow</h1>
 
-  //const dados = await resposta.json();
+        <p className="login-subtitulo">Faça login para continuar</p>
 
- login(resposta.data.usuario, resposta.data.token);
+        {erro && <p className="login-erro">{erro}</p>}
 
-  navigate("/");
-} catch (error) {
-  console.error("Erro ao conectar:", error);
+        <form onSubmit={handleLogin}>
+          <input
+            className="login-input"
+            type="email"
+            placeholder="E-mail"
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
+            required
+          />
 
-  setErro(
-    "Não foi possível conectar ao servidor."
+          <input
+            className="login-input"
+            type="password"
+            placeholder="Senha"
+            value={senha}
+            onChange={(event) => setSenha(event.target.value)}
+            required
+          />
+
+          <button
+            className="login-button"
+            type="submit"
+            disabled={carregando}
+          >
+            {carregando ? "Entrando..." : "Entrar"}
+          </button>
+        </form>
+
+        <p className="login-info">Use seu e-mail e senha cadastrados.</p>
+      </div>
+    </div>
   );
-} finally {
-  setCarregando(false);
-}
-
-}
-
-return (
-<div className="login-container">
-<div className="login-card">
-
-    <h1 className="login-logo">
-      TaskFlow
-    </h1>
-
-    <p className="login-subtitulo">
-      Faça login para continuar
-    </p>
-
-    {erro && (
-      <p className="login-erro">
-        {erro}
-      </p>
-    )}
-
-    <form onSubmit={handleLogin}>
-
-      <input
-        className="login-input"
-        type="email"
-        placeholder="E-mail"
-        value={email}
-        onChange={(event) =>
-          setEmail(event.target.value)
-        }
-        required
-      />
-
-      <input
-        className="login-input"
-        type="password"
-        placeholder="Senha"
-        value={senha}
-        onChange={(event) =>
-          setSenha(event.target.value)
-        }
-        required
-      />
-
-      <button
-        className="login-button"
-        type="submit"
-        disabled={carregando}
-      >
-        {carregando ? "Entrando..." : "Entrar"}
-      </button>
-
-    </form>
-
-    <p className="login-info">
-      Use seu e-mail e senha cadastrados.
-    </p>
-
-  </div>
-</div>
-
-);
 }
 
 export default Login;

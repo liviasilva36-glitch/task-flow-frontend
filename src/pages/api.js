@@ -1,27 +1,28 @@
-import axios from 'axios';
+
+import axios from "axios";
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_URL_BASE_API, // Porta em que a taskflow-api está rodando
+  baseURL: "http://localhost:3001", // Ou a URL da tua API
 });
 
-api.interceptors.request.use(
-  config => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`; 
-    }
-    return config;
-});
+// Apenas UMA declaração desta função no ficheiro todo:
+export function mensagensDeErro(erro) {
+  const dados = erro.response?.data?.erro;
 
-api.interceptors.response.use(
-  response => response,
-  error => {
-    if(error.response?.status === 401) {
-      localStorage.removeItem('token');
-      window.location.href = '/login';
-    }
-    return Promise.reject(error);
+  if (!erro.response) {
+    return ["Sem resposta do servidor. Verifique a ligação ou a API."];
   }
-);
+
+  if (Array.isArray(dados)) {
+    return dados;
+  }
+
+  if (typeof dados === "string") {
+    return [dados];
+  }
+
+  return ["Ocorreu um erro inesperado."];
+}
 
 export default api;
+

@@ -92,6 +92,44 @@
   gap: 10px;
 }
 
+/* ------------------------------- */
+/* PASSO 12 — CSS do modal */
+
+/* Campo = label em cima + input/select embaixo */
+.campo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.campo label {
+  color: #94A3B8;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* Lista de erros devolvidos pela API */
+.erros {
+  list-style: none;
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid #EF4444;
+  border-radius: 6px;
+  padding: 10px 14px;
+  color: #FCA5A5;
+  font-size: 0.85rem;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* Botão desabilitado */
+.botoes button:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
 
 /* ── BOTÃO CANCELAR ────────────────────────────────────── */
 
