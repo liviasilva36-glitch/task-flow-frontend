@@ -1,3 +1,4 @@
+
 // =============================================================
 // IMPORTS
 // =============================================================
@@ -6,9 +7,7 @@ import Header from './Header';
 import ListaTarefas from './ListaTarefas';
 import { useState, useEffect } from 'react';
 import ModalTarefa from './ModalTarefa';
-import axios from 'axios';
 import api from '../pages/api';
-
 
 // =============================================================
 // 1. ESTADO DA APLICAÇÃO
@@ -18,13 +17,14 @@ function TarefaV1() {
   // ───────────────────────────────────────────────────────────
   // 1.1 Estados principais
   // ───────────────────────────────────────────────────────────
-  const URL_API = 'https://6a8c289f63f113bab0b7f5d3.mockapi.io/tarefas';
-  
   const [modalAberto, setModalAberto] = useState(false);
   const [tarefaEditando, setTarefaEditando] = useState(null);
   const [colunaAtiva, setColunaAtiva] = useState('afazer');
   const [filtroPrioridade, setFiltroPrioridade] = useState('todas');
   const [tarefas, setTarefas] = useState([]);
+  const [usuarios, setUsuarios] = useState([]);
+  const [projetos, setProjetos] = useState([]);
+  const [prioridades, setPrioridades] = useState([]);
   const [erro, setErro] = useState('');
   const [carregando, setCarregando] = useState(true);
 
@@ -32,39 +32,37 @@ function TarefaV1() {
   // 2. EFEITOS
   // =============================================================
 
-  // ───────────────────────────────────────────────────────────
-  // 2.1 Salvar tarefas no LocalStorage
-  // ───────────────────────────────────────────────────────────
-
   useEffect(() => {
-    async function carregarTarefas() {
+    async function carregarDados() {
       try {
         setCarregando(true);
         setErro('');
 
-        // const resposta = await axios.get(URL_API);
+        const [resTarefas, resUsuarios, resProjetos, resPrioridades] = await Promise.all([
+          api.get('/tarefas'),
+          api.get('/usuarios').catch(() => ({ data: [] })),
+          api.get('/projetos').catch(() => ({ data: [] })),
+          api.get('/prioridades').catch(() => ({ data: [] }))
+        ]);
 
-        const resposta = await api.get('/tarefas');
-
-        setTarefas(resposta.data);
-
+        setTarefas(resTarefas.data);
+        setUsuarios(resUsuarios.data);
+        setProjetos(resProjetos.data);
+        setPrioridades(resPrioridades.data);
       } catch (e) {
-        setErro('Erro ao carregar tarefas. Verifique a conexao.');
+        setErro('Erro ao carregar dados. Verifique a conexão com a API.');
         console.error(e);
       } finally {
         setCarregando(false);
       }
     }
-    carregarTarefas();
+    carregarDados();
   }, []);
 
-  // ───────────────────────────────────────────────────────────
-  // 2.2 Atualizar título da página
-  // ───────────────────────────────────────────────────────────
-
   useEffect(() => {
-    const pendentes = tarefas.filter((tarefa) => tarefa.coluna === 'afazer' ||
-      tarefa.coluna === 'andamento').length;
+    const pendentes = tarefas.filter(
+      (tarefa) => tarefa.coluna === 'afazer' || tarefa.coluna === 'andamento'
+    ).length;
     if (pendentes > 0) {
       document.title = `(${pendentes}) TaskFlow`;
     } else {
@@ -76,19 +74,11 @@ function TarefaV1() {
   // 3. FUNÇÕES DO MODAL
   // =============================================================
 
-  // ───────────────────────────────────────────────────────────
-  // 3.1 Abrir modal para criar tarefa
-  // ─────────────────────────────────────────────────────
-
   function abrirModalCriar(coluna) {
     setTarefaEditando(null);
     setColunaAtiva(coluna);
     setModalAberto(true);
   }
-
-  // ───────────────────────────────────────────────────────────
-  // 3.2 Abrir modal para editar tarefa
-  // ─────────────────────────────────────────────────────
 
   function abrirModalEditar(tarefa) {
     setTarefaEditando(tarefa);
@@ -99,73 +89,54 @@ function TarefaV1() {
   // 4. FUNÇÕES DE GERENCIAMENTO DE TAREFAS
   // =============================================================
 
-  // ───────────────────────────────────────────────────────────
-  // 4.1 Salvar / editar tarefa
-  // ──────────────────────────────────────────────────────  
-
   async function salvarTarefa(dados) {
     try {
-      if (dados.id !== undefined) {
-        const { data: tarefaEditada } = await axios.put(
-          URL_API + '/' + dados.id,
-          {
-            texto: dados.texto,
-            prioridade: dados.prioridade,
-            cidade: dados.cidade,
-            coluna: dados.coluna,
-          }
+      if (dados.id) {
+        const { data: tarefaEditada } = await api.put(`/tarefas/${dados.id}`, dados);
+        setTarefas((tarefasAtuais) =>
+          tarefasAtuais.map((t) => (t.id === dados.id ? tarefaEditada : t))
         );
-        setTarefas(tarefasAtuais => tarefasAtuais.map(
-          t => t.id === dados.id ? tarefaEditada : t));
       } else {
-        const { data: novaTarefa } = await axios.post(URL_API, dados);
-        setTarefas(tarefasAtuais => [...tarefasAtuais, novaTarefa]);
+        const { data: novaTarefa } = await api.post('/tarefas', dados);
+        setTarefas((tarefasAtuais) => [...tarefasAtuais, novaTarefa]);
       }
+      setModalAberto(false);
     } catch (e) {
-      setErro('Erro ao salvar tarefa.');
       console.error(e);
+      throw e; // Lança a exceção para que o ModalTarefa exiba as validações no ecrã
     }
   }
 
-  // ───────────────────────────────────────────────────────────
-  // 4.2 Deletar tarefa
-  // ───────────────────────────────────────────────────────────
-
   async function deletarTarefa(id) {
-    const confirmado = window.confirm(
-      'Tem certeza que deseja deletar esta tarefa?'
-    );
+    const confirmado = window.confirm('Tem certeza que deseja deletar esta tarefa?');
     if (!confirmado) return;
 
     try {
-      await axios.delete(URL_API + '/' + id);
-
-      setTarefas(tarefasAtuais =>
-        tarefasAtuais.filter(tarefa => tarefa.id !== id)
-      );
+      await api.delete(`/tarefas/${id}`);
+      setTarefas((tarefasAtuais) => tarefasAtuais.filter((tarefa) => tarefa.id !== id));
     } catch (e) {
       setErro('Erro ao deletar tarefa. Tente novamente.');
       console.error(e);
     }
   }
 
-  // ───────────────────────────────────────────────────────────
-  // 4.3 Mover tarefa entre colunas
-  // ───────────────────────────────────────────────────────────
-
   async function moverTarefa(id, novaColuna) {
     try {
-      const { data: tarefaMovida } = await axios.put(
-        URL_API + '/' + id,
-        { coluna: novaColuna }
-      );
+      const tarefaAtual = tarefas.find((t) => t.id === id);
+      if (!tarefaAtual) return;
 
-      setTarefas(tarefasAtuais =>
-        tarefasAtuais.map(t =>
-          t.id === id ? tarefaMovida : t
-        )
-      );
+      const payloadAtualizado = { 
+        ...tarefaAtual, 
+        coluna: novaColuna,
+        usuarioId: tarefaAtual.usuarioId || tarefaAtual.usuario_id || 1,
+        projetoId: tarefaAtual.projetoId || tarefaAtual.projeto_id || 1
+      };
 
+      const { data: tarefaMovida } = await api.put(`/tarefas/${id}`, payloadAtualizado);
+
+      setTarefas((tarefasAtuais) =>
+        tarefasAtuais.map((t) => (t.id === id ? tarefaMovida : t))
+      );
     } catch (e) {
       setErro('Erro ao mover tarefa. Tente novamente.');
       console.error(e);
@@ -173,7 +144,7 @@ function TarefaV1() {
   }
 
   // =============================================================
-  // 5. FILTROS
+  // 5. FILTROS E ORDENAÇÃO
   // =============================================================
 
   const tarefasFiltradas = tarefas.filter((tarefa) => {
@@ -181,148 +152,142 @@ function TarefaV1() {
     return tarefa.prioridade === filtroPrioridade;
   });
 
+  // DESAFIO 4: Ordena os cartões pela propriedade 'ordem'
+  const tarefasOrdenadas = [...tarefasFiltradas].sort(
+    (a, b) => (a.ordem ?? 0) - (b.ordem ?? 0)
+  );
+
   // =============================================================
   // 6. INTERFACE
   // =============================================================
   return (
-    <div className='container' id='app'>
+    <div className="container" id="app">
+      <Header titulo="TaskFlow" subtitulo="gerenciador de Tarefa 🚀" />
 
-      {/* ─────────────────────────────────────────────────────
-      6.1 Cabeçalho
-      ───────────────────────────────────────────────────── */}
-      <Header
-        titulo='TaskFlow'
-        subtitulo='gerenciador de Tarefa 🚀' />
-
-      <main className='container'>
+      <main className="container">
         {carregando && (
           <p style={{ textAlign: 'center', color: '#94A3B8' }}>
             Carregando tarefas...
-          </p>)}
+          </p>
+        )}
 
         {erro && (
           <p style={{ textAlign: 'center', color: '#EF4444' }}>{erro}</p>
         )}
 
-
-        {/* ───────────────────────────────────────────────────
-        6.2 Filtro de prioridade
-      ─────────────────────────────────────────────────── */}
-        <div className='filtro-prioridade'>
+        <div className="filtro-prioridade">
           <label>Filtrar por prioridade:</label>
           <select
-            className='btn-filtro'
+            className="btn-filtro"
             value={filtroPrioridade}
             onChange={(e) => setFiltroPrioridade(e.target.value)}
           >
-            <option value='todas'>Todas</option>
-            <option value='alta'>Alta</option>
-            <option value='media'>Media</option>
-            <option value='baixa'>Baixa</option>
+            <option value="todas">Todas</option>
+            <option value="alta">Alta</option>
+            <option value="media">Media</option>
+            <option value="baixa">Baixa</option>
           </select>
         </div>
 
-        {/* ───────────────────────────────────────────────────
-        6.3 Quadro Kanban
-      ─────────────────────────────────────────────────── */}
-        {!carregando && !erro && (<>
-          <div className="kanban-quadro">
-            <div className="kanban-coluna">
+        {!carregando && !erro && (
+          <>
+            <div className="kanban-quadro">
+              {/* COLUNA: A FAZER */}
+              <div className="kanban-coluna">
+                <div className="kanban-coluna-header">
+                  <h3>A Fazer</h3>
+                  <span className="kanban-contador">
+                    {tarefas.filter((t) => t.coluna === 'afazer').length}
+                  </span>
+                  <button
+                    className="kanban-btn-add"
+                    onClick={() => abrirModalCriar('afazer')}
+                  >
+                    +
+                  </button>
+                </div>
 
-              {/* =================================================
-                  COLUNA: A FAZER
-              ================================================= */}
-              <div className="kanban-coluna-header">
-                <h3>A Fazer</h3>
-                <span className="kanban-contador">
-                  {tarefas.filter((tarefa) => tarefa.coluna === "afazer").length}
-                </span>
-                <button className='kanban-btn-add'
-                  onClick={() => abrirModalCriar('afazer')}>+</button>
+                <ListaTarefas
+                  tarefas={tarefasOrdenadas.filter((t) => t.coluna === 'afazer')}
+                  usuarios={usuarios}
+                  onDeletar={deletarTarefa}
+                  onEditar={abrirModalEditar}
+                  onMover={moverTarefa}
+                  colunaAnterior={null}
+                  colunaProxima="andamento"
+                />
               </div>
 
-              <ListaTarefas
-                tarefas={tarefasFiltradas.filter((tarefa) => tarefa.coluna === "afazer")}
-                onDeletar={deletarTarefa}
-                onEditar={abrirModalEditar}
-                onMover={moverTarefa}
-                colunaAnterior={null}
-                colunaProxima="andamento"
-              />
-            </div>
-
-            {/* =================================================
-                COLUNA: EM ANDAMENTO
-            ================================================= */}
-
-            <div className="kanban-coluna">
-              <div className="kanban-coluna-header">
-                <h3>Em Andamento</h3>
-                <span className="kanban-contador">
-                  {tarefas.filter(
-                    (tarefa) => tarefa.coluna === "andamento").length}
-                </span>
-                <button className='kanban-btn-add'
-                  onClick={() => abrirModalCriar('andamento')}>+</button>
+              {/* COLUNA: EM ANDAMENTO */}
+              <div className="kanban-coluna">
+                <div className="kanban-coluna-header">
+                  <h3>Em Andamento</h3>
+                  <span className="kanban-contador">
+                    {tarefas.filter((t) => t.coluna === 'andamento').length}
+                  </span>
+                  <button
+                    className="kanban-btn-add"
+                    onClick={() => abrirModalCriar('andamento')}
+                  >
+                    +
+                  </button>
+                </div>
+                <ListaTarefas
+                  tarefas={tarefasOrdenadas.filter((t) => t.coluna === 'andamento')}
+                  usuarios={usuarios}
+                  onDeletar={deletarTarefa}
+                  onEditar={abrirModalEditar}
+                  onMover={moverTarefa}
+                  colunaAnterior="afazer"
+                  colunaProxima="concluido"
+                />
               </div>
-              <ListaTarefas
-                tarefas={tarefasFiltradas.filter((tarefa) => tarefa.coluna === "andamento")}
-                onDeletar={deletarTarefa}
-                onEditar={abrirModalEditar}
-                onMover={moverTarefa}
-                colunaAnterior="afazer"
-                colunaProxima="concluido"
-              />
-            </div>
 
-            {/* =================================================
-                COLUNA: CONCLUÍDO
-            ================================================= */}
-
-            <div className="kanban-coluna">
-              <div className="kanban-coluna-header">
-                <h3>Concluído</h3>
-                <span className="kanban-contador">
-                  {tarefas.filter((tarefa) => tarefa.coluna === "concluido").length}
-                </span>
-                <button className='kanban-btn-add'
-                  onClick={() => abrirModalCriar('concluido')}>+</button>
+              {/* COLUNA: CONCLUÍDO */}
+              <div className="kanban-coluna">
+                <div className="kanban-coluna-header">
+                  <h3>Concluído</h3>
+                  <span className="kanban-contador">
+                    {tarefas.filter((t) => t.coluna === 'concluido').length}
+                  </span>
+                  <button
+                    className="kanban-btn-add"
+                    onClick={() => abrirModalCriar('concluido')}
+                  >
+                    +
+                  </button>
+                </div>
+                <ListaTarefas
+                  tarefas={tarefasOrdenadas.filter((t) => t.coluna === 'concluido')}
+                  usuarios={usuarios}
+                  onDeletar={deletarTarefa}
+                  onEditar={abrirModalEditar}
+                  onMover={moverTarefa}
+                  colunaAnterior="andamento"
+                  colunaProxima={null}
+                />
               </div>
-              <ListaTarefas
-                tarefas={tarefasFiltradas.filter((tarefa) => tarefa.coluna === "concluido")}
-                onDeletar={deletarTarefa}
-                onEditar={abrirModalEditar}
-                onMover={moverTarefa}
-                colunaAnterior="andamento"
-                colunaProxima={null}
-              />
             </div>
-          </div>
 
-          {/* ───────────────────────────────────────────────────
-            6.4 Modal de tarefa
-        ─────────────────────────────────────────────────── */}
-          <ModalTarefa
-            aberto={modalAberto}
-            onFechar={() => setModalAberto(false)}
-            onSalvar={salvarTarefa}
-            tarefa={tarefaEditando}
-            coluna={colunaAtiva}
-          />
-        </>)}
+            <ModalTarefa
+              aberto={modalAberto}
+              onFechar={() => setModalAberto(false)}
+              onSalvar={salvarTarefa}
+              tarefa={tarefaEditando}
+              coluna={colunaAtiva}
+              usuarios={usuarios}
+              projetos={projetos}
+              prioridades={prioridades}
+            />
+          </>
+        )}
       </main>
 
-      {/* ─────────────────────────────────────────────────────
-        6.5 Rodapé
-    ───────────────────────────────────────────────────── */}
       <footer>
         <p>TaskFlow 2026 - Prof. Alan Glei</p>
       </footer>
-
     </div>
   );
 }
 
-
-
-export default TarefaV1
+export default TarefaV1;

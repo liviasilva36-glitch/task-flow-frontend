@@ -1,43 +1,52 @@
-import styles from './TarefaItem.module.css'
+import styles from './TarefaItem.module.css';
 
 function TarefaItem({
-    texto, 
-    concluida = false, 
-    prioridade = 'media', 
-    cidade = "",
-    onDeletar, 
-    onEditar, 
-    onMover          = null,
-    colunaAnterior   = null,
-    colunaProxima    = null,
-    }){
+  texto, 
+  concluida = false, 
+  prioridade = 'media', 
+  cidade = "",
+  onDeletar, 
+  onEditar, 
+  onMover          = null,
+  colunaAnterior   = null,
+  colunaProxima    = null,
+}) {
 
-    const classeItem = (concluida
-    ? styles.tarefa + ' ' + styles.concluida
-    : styles.tarefa) + ' ' + styles[prioridade];
+  // Normaliza o nome da prioridade para evitar erros de leitura no CSS
+  const prioridadeClean = (prioridade || 'media').toLowerCase();
 
-    const classeTexto = concluida 
-        ? styles.textoTarefa + ' ' + styles['texto-tarefa'] 
-        : styles.textoTarefa
+  // Define as classes do container li
+  const classeItem = [
+    styles.tarefa,
+    concluida ? styles.concluida : '',
+    styles[prioridadeClean] || ''
+  ].filter(Boolean).join(' ');
 
-    const classePrioridade = 
-        styles ['badge-prioridade'] + ' ' + styles['badge-' + prioridade];
+  // Define as classes do texto principal
+  const classeTexto = concluida 
+    ? `${styles.textoTarefa} ${styles['texto-tarefa'] || ''}`.trim()
+    : styles.textoTarefa;
 
-    const modoKanban = onMover !== null;
+  // Define as classes da badge de prioridade
+  const classePrioridade = `${styles['badge-prioridade'] || ''} ${styles['badge-' + prioridadeClean] || ''}`.trim();
 
-    return(
+  const modoKanban = onMover !== null;
+
+  return (
     <li className={classeItem} onDoubleClick={onEditar}>
-      <dir className={styles.conteudo}>
+      <div className={styles.conteudo}>
         <span className={classeTexto}>{texto}</span>
         {cidade && <span className={styles.cidade}>{cidade}</span>}
-      </dir>
-      <span className={classePrioridade}>{prioridade}</span>
+      </div>
+
+      <span className={classePrioridade}>{prioridadeClean}</span>
        
       <div className={styles.acoes}>
         {modoKanban && colunaAnterior && (
           <button
+            type="button"
             className={styles.btnMover}
-            onClick={e => { e.stopPropagation(); onMover(colunaAnterior);}}
+            onClick={e => { e.stopPropagation(); onMover(colunaAnterior); }}
             title="Mover para coluna anterior"
           >
             ←
@@ -46,22 +55,26 @@ function TarefaItem({
 
         {modoKanban && colunaProxima && (
           <button
+            type="button"
             className={styles.btnMover}
-            onClick={e => { e.stopPropagation(); onMover(colunaProxima);}}
+            onClick={e => { e.stopPropagation(); onMover(colunaProxima); }}
             title="Mover para próxima coluna"
           >
             →
           </button>
         )}
 
-        <button className={styles.btnDeletar} onClick={e => { e.stopPropagation(); onDeletar();}}>
+        <button 
+          type="button"
+          className={styles.btnDeletar} 
+          onClick={e => { e.stopPropagation(); onDeletar(); }}
+          title="Excluir tarefa"
+        >
           X
         </button>
-
       </div>
-    
     </li>
-    );
+  );
 }
 
 export default TarefaItem;

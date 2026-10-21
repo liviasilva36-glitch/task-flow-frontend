@@ -1,8 +1,10 @@
-import TarefaItem from './TarefaItem';
 
+
+import TarefaItem from './TarefaItem';
 
 function ListaTarefas({ 
   tarefas, 
+  usuarios = [], // 👈 Recebe 'usuarios' no plural
   onEditar, 
   onDeletar, 
   onMover          = null,
@@ -11,7 +13,6 @@ function ListaTarefas({
 }) {
 
   return (
-    
     <section id='lista-section'>
       {tarefas.length === 0 && (
         <p className='msg-vazia'>
@@ -20,16 +21,17 @@ function ListaTarefas({
       )}
 
       {tarefas.length > 0 && (
-        <ul id='lista-tarefas'>
+        <ul id='lista-tarefas' style={{ listStyle: 'none', padding: 0, margin: 0 }}>
           {tarefas.map(tarefa => (
             <TarefaItem
               key={tarefa.id}
+              tarefa={tarefa}
+              usuarios={usuarios} // 👈 Corrigido: repassa 'usuarios' (no plural)
               texto={tarefa.texto}
               cidade={tarefa.cidade}
-              // concluida={tarefa.concluida}
               prioridade={tarefa.prioridade}
               coluna={tarefa.coluna}
-              onDeletar = {() => onDeletar(tarefa.id)}
+              onDeletar={() => onDeletar(tarefa.id)}
               onEditar={onEditar ? () => onEditar(tarefa) : undefined}
               onMover={
                 onMover
@@ -43,8 +45,7 @@ function ListaTarefas({
         </ul>
       )}
     </section>
-    
   );
 }
-export default ListaTarefas;
 
+export default ListaTarefas;

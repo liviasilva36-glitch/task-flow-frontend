@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 // Importação com extensão .js explícita para evitar erros de resolução do Vite
 import { mensagensDeErro } from "../pages/api.js";
@@ -8,6 +9,13 @@ import styles from "./ModalTarefa.module.css";
 function paraNumero(valor) {
   return valor ? Number(valor) : null;
 }
+
+// Mapeamento auxiliar para garantir o envio textual da prioridade esperado pela API
+const NOMES_PRIORIDADE = {
+  1: 'baixa',
+  2: 'media',
+  3: 'alta'
+};
 
 function ModalTarefa({ 
   aberto, 
@@ -28,22 +36,44 @@ function ModalTarefa({
   const [erros, setErros] = useState([]);
   const [salvando, setSalvando] = useState(false);
 
-  // Preenche os campos ao abrir o modal
+  // DESAFIO 1: Filtra apenas os projetos pertencentes ao responsável selecionado
+  const projetosDoUsuario = projetos.filter(
+    (p) => Number(p.usuario_id || p.usuarioId) === Number(idUsuario)
+  );
+
+  // Preenche os campos SOMENTE quando o modal é aberto ou quando a tarefa selecionada muda
   useEffect(() => {
+    if (!aberto) return;
+
     setErros([]);
 
     if (tarefa) {
       setTexto(tarefa.texto || "");
-      setIdPrioridade(tarefa.idprioridade);
-      setIdUsuario(tarefa.usuario_id);
-      setIdProjeto(tarefa.projeto_id);
+      setIdPrioridade(tarefa.idprioridade ?? tarefa.idPrioridade ?? 2);
+      setIdUsuario(tarefa.usuarioId ?? tarefa.usuario_id ?? "");
+      setIdProjeto(tarefa.projetoId ?? tarefa.projeto_id ?? "");
     } else {
+      const usuarioPadrao = usuario?.id || usuarios[0]?.id || "";
       setTexto("");
       setIdPrioridade(2); // 2 = Médio
-      setIdUsuario(usuario?.id || usuarios[0]?.id || "");
-      setIdProjeto(projetos[0]?.id || "");
+      setIdUsuario(usuarioPadrao);
+
+      // Define o primeiro projeto do responsável selecionado por padrão
+      const projetosFiltrados = projetos.filter(
+        (p) => Number(p.usuario_id || p.usuarioId) === Number(usuarioPadrao)
+      );
+      setIdProjeto(projetosFiltrados[0]?.id || projetos[0]?.id || "");
     }
-  }, [tarefa, aberto, usuario, usuarios, projetos]); 
+  }, [aberto, tarefa?.id]); 
+
+  // Quando o usuário muda o responsável no select, ajusta o projeto selecionado
+  function handleUsuarioChange(novoIdUsuario) {
+    setIdUsuario(novoIdUsuario);
+    const projetosFiltrados = projetos.filter(
+      (p) => Number(p.usuario_id || p.usuarioId) === Number(novoIdUsuario)
+    );
+    setIdProjeto(projetosFiltrados[0]?.id || "");
+  }
 
   // Função para guardar/enviar a tarefa para a API
   async function handleSalvar() {
@@ -51,15 +81,24 @@ function ModalTarefa({
     setSalvando(true);
     
     try {
-      await onSalvar({
-        ...tarefa,
-        id: tarefa?.id,
-        texto,
-        coluna: tarefa?.coluna || coluna,
-        idprioridade: paraNumero(idPrioridade),
-        usuario_id: paraNumero(idUsuario),
-        projeto_id: paraNumero(idProjeto),
-      });
+      const prioridadeIdNum = paraNumero(idPrioridade) || 2;
+      const prioridadeTexto = NOMES_PRIORIDADE[prioridadeIdNum] || 'media';
+
+      // Monta o payload com 'usuarioId' e 'projetoId' no formato exigido pela API
+      const payload = {
+        texto: texto.trim(),
+        coluna: tarefa?.coluna || coluna || 'afazer',
+        prioridade: prioridadeTexto,
+        idprioridade: prioridadeIdNum,
+        usuarioId: paraNumero(idUsuario) || (usuario?.id ? Number(usuario.id) : 1),
+        projetoId: paraNumero(idProjeto) || 1
+      };
+
+      if (tarefa?.id) {
+        payload.id = tarefa.id;
+      }
+
+      await onSalvar(payload);
 
       onFechar(); // Só fecha o modal se a requisição for bem-sucedida
     } catch (e) {
@@ -91,7 +130,7 @@ function ModalTarefa({
           <select
             id="tarefa-responsavel"
             value={idUsuario}
-            onChange={(e) => setIdUsuario(e.target.value)}
+            onChange={(e) => handleUsuarioChange(e.target.value)}
           >
             {usuarios.map((u) => (
               <option key={u.id} value={u.id}>
@@ -108,11 +147,15 @@ function ModalTarefa({
             value={idProjeto}
             onChange={(e) => setIdProjeto(e.target.value)}
           >
-            {projetos.map((p) => (
-              <option key={p.id} value={p.id}>
-                {p.nome}
-              </option>
-            ))}
+            {projetosDoUsuario.length > 0 ? (
+              projetosDoUsuario.map((p) => (
+                <option key={p.id} value={p.id}>
+                  {p.nome}
+                </option>
+              ))
+            ) : (
+              <option value="">Nenhum projeto encontrado para este responsável</option>
+            )}
           </select>
         </div>
 
@@ -123,11 +166,19 @@ function ModalTarefa({
             value={idPrioridade}
             onChange={(e) => setIdPrioridade(e.target.value)}
           >
-            {prioridades.map((p) => (
-              <option key={p.id} value={p.id}>
-                {p.descricao || p.nome}
-              </option>
-            ))}
+            {prioridades.length > 0 ? (
+              prioridades.map((p) => (
+                <option key={p.id} value={p.id}>
+                  {p.descricao || p.nome}
+                </option>
+              ))
+            ) : (
+              <>
+                <option value={1}>Baixa</option>
+                <option value={2}>Média</option>
+                <option value={3}>Alta</option>
+              </>
+            )}
           </select>
         </div>
 
