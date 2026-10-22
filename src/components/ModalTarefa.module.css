@@ -1,6 +1,6 @@
 /* ── OVERLAY ───────────────────────────────────────────── */
 
-.overlay {
+.modal-overlay {
   position: fixed;
   inset: 0;
 
@@ -16,9 +16,9 @@
 }
 
 
-/* ── CARD ──────────────────────────────────────────────── */
+/* ── CARD / CONTEÚDO DO MODAL ──────────────────────────── */
 
-.card {
+.modal-content {
   display: flex;
   flex-direction: column;
   gap: 14px;
@@ -40,17 +40,32 @@
 
 /* ── TÍTULO ───────────────────────────────────────────── */
 
-.card h2 {
+.modal-content h2 {
   color: #a78bfa;
 
   font-size: 1.2rem;
 }
 
 
-/* ── CAMPOS ───────────────────────────────────────────── */
+/* ── CAMPOS (Módulo CSS) ───────────────────────────────── */
 
-.card input,
-.card select {
+.campo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.campo label {
+  color: #94A3B8;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* Inputs e Selects dentro de .campo */
+.campo input,
+.campo select {
   padding: 10px 14px;
 
   background-color: #f8fafc;
@@ -68,8 +83,8 @@
 
 /* ── FOCO ─────────────────────────────────────────────── */
 
-.card input:focus,
-.card select:focus {
+.campo input:focus,
+.campo select:focus {
   border-color: #22d3ee;
   box-shadow: 0 0 0 2px rgba(34, 211, 238, 0.15);
 }
@@ -84,33 +99,8 @@
 }
 
 
-/* ── BOTÕES ────────────────────────────────────────────── */
+/* ── LISTA DE ERROS ────────────────────────────────────── */
 
-.botoes {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-}
-
-/* ------------------------------- */
-/* PASSO 12 — CSS do modal */
-
-/* Campo = label em cima + input/select embaixo */
-.campo {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.campo label {
-  color: #94A3B8;
-  font-size: 0.8rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
-
-/* Lista de erros devolvidos pela API */
 .erros {
   list-style: none;
   background: rgba(239, 68, 68, 0.12);
@@ -122,6 +112,15 @@
   display: flex;
   flex-direction: column;
   gap: 4px;
+}
+
+
+/* ── BOTÕES ────────────────────────────────────────────── */
+
+.botoes {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
 }
 
 /* Botão desabilitado */

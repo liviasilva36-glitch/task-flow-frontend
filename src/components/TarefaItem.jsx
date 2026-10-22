@@ -13,24 +13,41 @@ function TarefaItem({
 }) {
 
   // Normaliza o nome da prioridade para evitar erros de leitura no CSS
-  const prioridadeClean = (prioridade || 'media').toLowerCase();
+  const valorPrioridade = typeof prioridade === 'object' 
+  ? (prioridade?.nome || prioridade?.descricao || 'media')
+  : (prioridade || 'media');
 
   // Define as classes do container li
+  const prioridadeClean = String(valorPrioridade)
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase();
+
+
+    const rótulosPrioridade = {
+    alta: 'Alta',
+    media: 'Média',
+    baixa: 'Baixa'
+  };
+
+  const textoExibicao = rótulosPrioridade[prioridadeClean] || prioridadeClean;
+
+
+  // Define as classes do texto principal
   const classeItem = [
     styles.tarefa,
     concluida ? styles.concluida : '',
     styles[prioridadeClean] || ''
   ].filter(Boolean).join(' ');
 
-  // Define as classes do texto principal
-  const classeTexto = concluida 
+  // Define as classes da badge de prioridade
+const classeTexto = concluida 
     ? `${styles.textoTarefa} ${styles['texto-tarefa'] || ''}`.trim()
     : styles.textoTarefa;
 
-  // Define as classes da badge de prioridade
-  const classePrioridade = `${styles['badge-prioridade'] || ''} ${styles['badge-' + prioridadeClean] || ''}`.trim();
+     const classePrioridade = `${styles['badge-prioridade'] || ''} ${styles['badge-' + prioridadeClean] || ''}`.trim();
 
-  const modoKanban = onMover !== null;
+    const modoKanban = onMover !== null;
 
   return (
     <li className={classeItem} onDoubleClick={onEditar}>

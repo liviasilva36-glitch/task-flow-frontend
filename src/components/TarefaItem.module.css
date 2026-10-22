@@ -176,3 +176,20 @@
   background-color: #22c55e;
   color: #052e16;
 }  
+
+/* ── BADGE DE PRIORIDADE ───────────────────────────────── */
+
+.badge-prioridade {
+  padding: 4px 10px;
+
+  border-radius: 12px;
+
+  font-size: 12px;
+  font-weight: 600;
+
+  letter-spacing: 0.05em;
+
+  /* Adicionado para manter a badge compacta no card */
+  align-self: flex-start;
+  width: fit-content;
+}

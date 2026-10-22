@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 // Importação com extensão .js explícita para evitar erros de resolução do Vite
 import { mensagensDeErro } from "../pages/api.js";
@@ -10,35 +9,28 @@ function paraNumero(valor) {
   return valor ? Number(valor) : null;
 }
 
-// Mapeamento auxiliar para garantir o envio textual da prioridade esperado pela API
-const NOMES_PRIORIDADE = {
-  1: 'baixa',
-  2: 'media',
-  3: 'alta'
-};
-
-function ModalTarefa({ 
-  aberto, 
-  onFechar, 
-  onSalvar, 
-  tarefa = null, 
-  coluna = 'afazer',
+function ModalTarefa({
+  aberto,
+  onFechar,
+  onSalvar,
+  tarefa = null,
+  coluna = "afazer",
   prioridades = [],
   usuarios = [],
-  projetos = []
+  projetos = [],
 }) {
   const { usuario } = useAuth();
 
-  const [texto, setTexto] = useState('');
-  const [idPrioridade, setIdPrioridade] = useState(2); // 2 = Médio (padrão)
+  const [texto, setTexto] = useState("");
+  const [idPrioridade, setIdPrioridade] = useState(2); // ID padrão
   const [idUsuario, setIdUsuario] = useState("");
   const [idProjeto, setIdProjeto] = useState("");
   const [erros, setErros] = useState([]);
   const [salvando, setSalvando] = useState(false);
 
-  // DESAFIO 1: Filtra apenas os projetos pertencentes ao responsável selecionado
+  // Filtra apenas os projetos pertencentes ao responsável selecionado
   const projetosDoUsuario = projetos.filter(
-    (p) => Number(p.usuario_id || p.usuarioId) === Number(idUsuario)
+    (p) => Number(p.usuario_id || p.usuarioId) === Number(idUsuario),
   );
 
   // Preenche os campos SOMENTE quando o modal é aberto ou quando a tarefa selecionada muda
@@ -48,29 +40,33 @@ function ModalTarefa({
     setErros([]);
 
     if (tarefa) {
-      setTexto(tarefa.texto || "");
-      setIdPrioridade(tarefa.idprioridade ?? tarefa.idPrioridade ?? 2);
+      setTexto(tarefa.texto || tarefa.descricao || "");
+      setIdPrioridade(
+        tarefa.idprioridade ?? tarefa.idPrioridade ?? tarefa.prioridade_id ?? 2,
+      );
       setIdUsuario(tarefa.usuarioId ?? tarefa.usuario_id ?? "");
       setIdProjeto(tarefa.projetoId ?? tarefa.projeto_id ?? "");
     } else {
       const usuarioPadrao = usuario?.id || usuarios[0]?.id || "";
+      const prioridadePadrao = prioridades[0]?.id || 2;
+
       setTexto("");
-      setIdPrioridade(2); // 2 = Médio
+      setIdPrioridade(prioridadePadrao);
       setIdUsuario(usuarioPadrao);
 
       // Define o primeiro projeto do responsável selecionado por padrão
       const projetosFiltrados = projetos.filter(
-        (p) => Number(p.usuario_id || p.usuarioId) === Number(usuarioPadrao)
+        (p) => Number(p.usuario_id || p.usuarioId) === Number(usuarioPadrao),
       );
       setIdProjeto(projetosFiltrados[0]?.id || projetos[0]?.id || "");
     }
-  }, [aberto, tarefa?.id]); 
+  }, [aberto, tarefa?.id]);
 
   // Quando o usuário muda o responsável no select, ajusta o projeto selecionado
   function handleUsuarioChange(novoIdUsuario) {
     setIdUsuario(novoIdUsuario);
     const projetosFiltrados = projetos.filter(
-      (p) => Number(p.usuario_id || p.usuarioId) === Number(novoIdUsuario)
+      (p) => Number(p.usuario_id || p.usuarioId) === Number(novoIdUsuario),
     );
     setIdProjeto(projetosFiltrados[0]?.id || "");
   }
@@ -79,19 +75,29 @@ function ModalTarefa({
   async function handleSalvar() {
     setErros([]);
     setSalvando(true);
-    
+
     try {
       const prioridadeIdNum = paraNumero(idPrioridade) || 2;
-      const prioridadeTexto = NOMES_PRIORIDADE[prioridadeIdNum] || 'media';
 
-      // Monta o payload com 'usuarioId' e 'projetoId' no formato exigido pela API
+      // Busca o objeto de prioridade selecionado na lista recebida por props
+      const objPrioridade = prioridades.find(
+        (p) => Number(p.id) === Number(prioridadeIdNum),
+      );
+
+      // Obtém o nome real da prioridade dinamicamente (ex: 'baixa', 'media', 'alta')
+      const prioridadeTexto = objPrioridade
+        ? objPrioridade.nome || objPrioridade.descricao
+        : "media";
+
+      // Monta o payload no formato exigido pela API
       const payload = {
         texto: texto.trim(),
-        coluna: tarefa?.coluna || coluna || 'afazer',
-        prioridade: prioridadeTexto,
+        coluna: tarefa?.coluna || coluna || "afazer",
+        prioridade: String(prioridadeTexto).toLowerCase(),
         idprioridade: prioridadeIdNum,
-        usuarioId: paraNumero(idUsuario) || (usuario?.id ? Number(usuario.id) : 1),
-        projetoId: paraNumero(idProjeto) || 1
+        usuarioId:
+          paraNumero(idUsuario) || (usuario?.id ? Number(usuario.id) : 1),
+        projetoId: paraNumero(idProjeto) || 1,
       };
 
       if (tarefa?.id) {
@@ -108,11 +114,11 @@ function ModalTarefa({
     }
   }
 
-  if (!aberto) return null; 
+  if (!aberto) return null;
 
   return (
-    <div className="modal-overlay">
-      <div className="modal-content">
+    <div className={styles["modal-overlay"]}>
+      <div className={styles["modal-content"]}>
         <h2>{tarefa ? "Editar Tarefa" : "Nova Tarefa"}</h2>
 
         <div className={styles.campo}>
@@ -154,7 +160,9 @@ function ModalTarefa({
                 </option>
               ))
             ) : (
-              <option value="">Nenhum projeto encontrado para este responsável</option>
+              <option value="">
+                Nenhum projeto encontrado para este responsável
+              </option>
             )}
           </select>
         </div>
@@ -169,7 +177,7 @@ function ModalTarefa({
             {prioridades.length > 0 ? (
               prioridades.map((p) => (
                 <option key={p.id} value={p.id}>
-                  {p.descricao || p.nome}
+                  {p.nome || p.descricao}
                 </option>
               ))
             ) : (
@@ -191,12 +199,13 @@ function ModalTarefa({
         )}
 
         <div className={styles.botoes}>
-          <button type="button" onClick={onFechar}>Cancelar</button>
+          <button type="button" onClick={onFechar}>
+            Cancelar
+          </button>
           <button type="button" onClick={handleSalvar} disabled={salvando}>
             {salvando ? "Salvando..." : "Salvar"}
           </button>
         </div>
-
       </div>
     </div>
   );

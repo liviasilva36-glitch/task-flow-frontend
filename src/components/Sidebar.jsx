@@ -3,87 +3,50 @@ import styles from "./Sidebar.module.css";
 import { useAuth } from "../contexts/AuthContext";
 
 function Sidebar() {
+  const { usuario, token, logout } = useAuth();
 
-    const { usuario, token, logout } = useAuth();
+  const navigate = useNavigate();
 
-    const navigate = useNavigate();
+  const logado = !!token;
 
+  function handleLogout() {
+    logout();
 
-    const logado = !!token;
+    navigate("/login");
+  }
 
+  const linkClass = ({ isActive }) =>
+    isActive ? `${styles.link} ${styles.ativo}` : styles.link;
 
-    function handleLogout() {
+  return (
+    <aside className={styles.sidebar}>
+      <div className={styles.logo}>
+        <h1>TaskFlow</h1>
+      </div>
 
-        logout();
+      <nav className={styles.nav}>
+        <NavLink to="/" className={linkClass}>
+          Dashboard
+        </NavLink>
 
-        navigate("/login");
-    }
+        <NavLink to="/sobre" className={linkClass}>
+          Sobre
+        </NavLink>
 
+        <NavLink to="/login" className={linkClass}>
+          Login
+        </NavLink>
+      </nav>
 
-    const linkClass = ({ isActive }) =>
-        isActive
-            ? `${styles.link} ${styles.ativo}`
-            : styles.link;
+      {logado && (
+        <div className={styles.sidebarUsuario}>
+          <span>Olá, {usuario?.nome ?? "Usuário"}</span>
 
-
-    return (
-
-        <aside className={styles.sidebar}>
-
-            <div className={styles.logo}>
-                <h1>TaskFlow</h1>
-            </div>
-
-
-            <nav className={styles.nav}>
-
-                <NavLink
-                    to="/"
-                    className={linkClass}
-                >
-                    Dashboard
-                </NavLink>
-
-
-                <NavLink
-                    to="/sobre"
-                    className={linkClass}
-                >
-                    Sobre
-                </NavLink>
-
-
-                <NavLink
-                    to="/login"
-                    className={linkClass}
-                >
-                    Login
-                </NavLink>
-
-            </nav>
-
-
-            {logado && (
-
-                <div className={styles.sidebarUsuario}>
-
-                    <span>
-                        Olá, {usuario?.nome ?? "Usuário"}
-                    </span>
-
-
-                    <button onClick={handleLogout}>
-                        Sair
-                    </button>
-
-                </div>
-
-            )}
-
-        </aside>
-
-    );
+          <button onClick={handleLogout}>Sair</button>
+        </div>
+      )}
+    </aside>
+  );
 }
-
 
 export default Sidebar;
