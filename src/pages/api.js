@@ -1,8 +1,7 @@
-
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "http://localhost:3001", // Ou a URL da tua API
+  baseURL: import.meta.env.VITE_URL_BASE_API || "https://task-flow-node.vercel.app",
 });
 
 // Apenas UMA declaração desta função no ficheiro todo:
@@ -25,4 +24,3 @@ export function mensagensDeErro(erro) {
 }
 
 export default api;
-
