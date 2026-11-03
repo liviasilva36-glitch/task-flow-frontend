@@ -134,17 +134,29 @@ function TarefaV1() {
         1
       );
 
+      const textoFinal = tarefaAtual.texto || tarefaAtual.descricao || '';
+      const usuarioIdNum = Number(tarefaAtual.usuarioId ?? tarefaAtual.usuario_id ?? 1);
+      const projetoIdNum = Number(tarefaAtual.projetoId ?? tarefaAtual.projeto_id ?? 1);
+
       const payloadAtualizado = {
         ...tarefaAtual,
+        id: Number(id),
         coluna: novaColuna,
+        status: novaColuna,
+        situacao: novaColuna,
+
+        texto: textoFinal,
+        descricao: textoFinal,
+
         idprioridade: idPrioridadeNum,
         idPrioridade: idPrioridadeNum,
         prioridade_id: idPrioridadeNum,
-        usuarioId: Number(tarefaAtual.usuarioId ?? tarefaAtual.usuario_id ?? 1),
-        usuario_id: Number(tarefaAtual.usuario_id ?? tarefaAtual.usuarioId ?? 1),
-        projetoId: Number(tarefaAtual.projetoId ?? tarefaAtual.projeto_id ?? 1),
-        projeto_id: Number(tarefaAtual.projeto_id ?? tarefaAtual.projetoId ?? 1),
-        texto: tarefaAtual.texto || tarefaAtual.descricao || ''
+
+        usuarioId: usuarioIdNum,
+        usuario_id: usuarioIdNum,
+
+        projetoId: projetoIdNum,
+        projeto_id: projetoIdNum,
       };
 
       const { data: tarefaMovida } = await api.put(`/tarefas/${id}`, payloadAtualizado);
