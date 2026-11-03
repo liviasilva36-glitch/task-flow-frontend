@@ -3,7 +3,6 @@ import { mensagensDeErro } from "../pages/api.js";
 import { useAuth } from "../contexts/AuthContext";
 import styles from "./ModalTarefa.module.css";
 
-// Função utilitária para converter valor para número ou null se estiver vazio
 function paraNumero(valor) {
   return valor !== null && valor !== undefined && valor !== "" ? Number(valor) : null;
 }
@@ -27,19 +26,16 @@ function ModalTarefa({
   const [erros, setErros] = useState([]);
   const [salvando, setSalvando] = useState(false);
 
-  // Filtra projetos pertencentes ao responsável selecionado
   const projetosDoUsuario = projetos.filter(
     (p) => Number(p.usuario_id || p.usuarioId) === Number(idUsuario)
   );
 
-  // Lista unificada de prioridades (garante fallback caso venha vazia do backend)
   const listaPrioridades = prioridades.length > 0 ? prioridades : [
     { id: 1, nome: "baixa", descricao: "Baixa" },
     { id: 2, nome: "media", descricao: "Média" },
     { id: 3, nome: "alta", descricao: "Alta" }
   ];
 
-  // Atualiza os campos sempre que o modal abre ou os dados mudam
   useEffect(() => {
     if (!aberto) return;
 
@@ -58,7 +54,7 @@ function ModalTarefa({
       setIdProjeto(String(projId));
     } else {
       const usuarioPadrao = usuario?.id || usuarios[0]?.id || "";
-      const prioridadePadrao = listaPrioridades[0]?.id ? String(listaPrioridades[0].id) : "2";
+      const prioridadePadrao = "2";
 
       setTexto("");
       setIdPrioridade(prioridadePadrao);
@@ -67,20 +63,22 @@ function ModalTarefa({
       const projsIniciais = projetos.filter(
         (p) => Number(p.usuario_id || p.usuarioId) === Number(usuarioPadrao)
       );
-      setIdProjeto(projsIniciais[0]?.id ? String(projsIniciais[0].id) : "");
+
+      const projInicialId = projsIniciais[0]?.id || projetos[0]?.id || "1";
+      setIdProjeto(String(projInicialId));
     }
   }, [aberto, tarefa, prioridades, usuario, usuarios, projetos]);
 
-  // Ajusta o projeto selecionado quando o responsável muda
   function handleUsuarioChange(novoIdUsuario) {
     setIdUsuario(novoIdUsuario);
     const projetosFiltrados = projetos.filter(
       (p) => Number(p.usuario_id || p.usuarioId) === Number(novoIdUsuario)
     );
-    setIdProjeto(projetosFiltrados[0]?.id ? String(projetosFiltrados[0].id) : "");
+
+    const novoProjId = projetosFiltrados[0]?.id || projetos[0]?.id || "1";
+    setIdProjeto(String(novoProjId));
   }
 
-  // Submissão e validação
   async function handleSalvar() {
     setErros([]);
     
@@ -89,20 +87,11 @@ function ModalTarefa({
       return;
     }
 
-    const projetoIdCalculado = paraNumero(idProjeto) || 
-      (projetosDoUsuario.length > 0 ? Number(projetosDoUsuario[0].id) : null);
-
-    if (!projetoIdCalculado) {
-      setErros(["Selecione um projeto válido antes de salvar."]);
-      return;
-    }
-
     setSalvando(true);
 
     try {
       const prioridadeIdNum = Number(idPrioridade) || 2;
 
-      // Localiza o objeto de prioridade na lista unificada
       const objPrioridade = listaPrioridades.find(
         (p) => Number(p.id || p.idprioridade) === prioridadeIdNum
       );
@@ -119,7 +108,9 @@ function ModalTarefa({
 
       const textoPrioridadeBaixa = String(prioridadeTexto).toLowerCase();
 
-      // Payload completo para suportar diferentes estruturas de API
+      const projetoIdCalculado = paraNumero(idProjeto) || 
+        (projetosDoUsuario.length > 0 ? Number(projetosDoUsuario[0].id) : (projetos[0]?.id ? Number(projetos[0].id) : 1));
+
       const payload = {
         texto: texto.trim(),
         coluna: tarefa?.coluna || coluna || "afazer",
@@ -183,7 +174,7 @@ function ModalTarefa({
           <label htmlFor="tarefa-projeto">Projeto</label>
           <select
             id="tarefa-projeto"
-            value={idProjeto}
+            value={String(idProjeto)}
             onChange={(e) => setIdProjeto(e.target.value)}
           >
             {projetosDoUsuario.length > 0 ? (
@@ -192,10 +183,14 @@ function ModalTarefa({
                   {p.nome}
                 </option>
               ))
+            ) : projetos.length > 0 ? (
+              projetos.map((p) => (
+                <option key={p.id} value={String(p.id)}>
+                  {p.nome}
+                </option>
+              ))
             ) : (
-              <option value="">
-                Nenhum projeto encontrado para este responsável
-              </option>
+              <option value="1">Projeto Padrão</option>
             )}
           </select>
         </div>
