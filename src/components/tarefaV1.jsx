@@ -138,37 +138,43 @@ function TarefaV1() {
       const usuarioIdNum = Number(tarefaAtual.usuarioId ?? tarefaAtual.usuario_id ?? 1);
       const projetoIdNum = Number(tarefaAtual.projetoId ?? tarefaAtual.projeto_id ?? 1);
 
-      const payloadAtualizado = {
-        ...tarefaAtual,
-        id: Number(id),
+      const payloadMovimentacao = {
         coluna: novaColuna,
         status: novaColuna,
-        situacao: novaColuna,
-
         texto: textoFinal,
         descricao: textoFinal,
-
         idprioridade: idPrioridadeNum,
-        idPrioridade: idPrioridadeNum,
-        prioridade_id: idPrioridadeNum,
-
-        usuarioId: usuarioIdNum,
         usuario_id: usuarioIdNum,
-
-        projetoId: projetoIdNum,
-        projeto_id: projetoIdNum,
+        projeto_id: projetoIdNum
       };
 
-      const { data: tarefaMovida } = await api.put(`/tarefas/${id}`, payloadAtualizado);
+      let tarefaMovida;
+
+      try {
+        const resposta = await api.put(`/tarefas/${id}`, payloadMovimentacao);
+        tarefaMovida = resposta.data;
+      } catch (errPrimario) {
+        if (errPrimario.response?.status === 409) {
+          const respostaFallback = await api.put(`/tarefas/${id}`, {
+            coluna: novaColuna,
+            status: novaColuna
+          });
+          tarefaMovida = respostaFallback.data;
+        } else {
+          throw errPrimario;
+        }
+      }
 
       setTarefas((tarefasAtuais) =>
         tarefasAtuais.map((t) =>
-          t.id === id ? { ...payloadAtualizado, ...tarefaMovida } : t
+          t.id === id
+            ? { ...t, ...payloadMovimentacao, ...tarefaMovida, coluna: novaColuna }
+            : t
         )
       );
     } catch (e) {
       setErro('Erro ao mover tarefa. Tente novamente.');
-      console.error('Erro detalhado da API ao mover:', e.response?.data || e.message);
+      console.error('Resposta da API:', e.response?.data || e.message);
     }
   }
 

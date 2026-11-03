@@ -111,9 +111,15 @@ function ModalTarefa({
       const projetoIdCalculado = paraNumero(idProjeto) || 
         (projetosDoUsuario.length > 0 ? Number(projetosDoUsuario[0].id) : (projetos[0]?.id ? Number(projetos[0].id) : 1));
 
+      const textoFinal = texto.trim();
+      const colunaFinal = tarefa?.coluna || coluna || "afazer";
+
       const payload = {
-        texto: texto.trim(),
-        coluna: tarefa?.coluna || coluna || "afazer",
+        texto: textoFinal,
+        descricao: textoFinal,
+        coluna: colunaFinal,
+        status: colunaFinal,
+        situacao: colunaFinal,
         prioridade: textoPrioridadeBaixa,
         idPrioridade: prioridadeIdNum,
         idprioridade: prioridadeIdNum,
@@ -132,7 +138,11 @@ function ModalTarefa({
       await onSalvar(payload);
       onFechar();
     } catch (e) {
-      setErros(mensagensDeErro(e));
+      if (typeof mensagensDeErro === "function") {
+        setErros(mensagensDeErro(e));
+      } else {
+        setErros([e.response?.data?.message || e.response?.data?.erro || "Erro ao salvar a tarefa."]);
+      }
     } finally {
       setSalvando(false);
     }
