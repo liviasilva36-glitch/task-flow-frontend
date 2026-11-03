@@ -138,14 +138,15 @@ function TarefaV1() {
       const usuarioIdNum = Number(tarefaAtual.usuarioId ?? tarefaAtual.usuario_id ?? 1);
       const projetoIdNum = Number(tarefaAtual.projetoId ?? tarefaAtual.projeto_id ?? 1);
 
-      // Payload padronizado para a API do Vercel
+      // Payload estrito com usuarioId e projetoId em camelCase para atender à API
       const payloadMovimentacao = {
         coluna: novaColuna,
         texto: textoFinal,
         descricao: textoFinal,
         idprioridade: idPrioridadeNum,
-        usuario_id: usuarioIdNum,
-        projeto_id: projetoIdNum
+        idPrioridade: idPrioridadeNum,
+        usuarioId: usuarioIdNum,
+        projetoId: projetoIdNum
       };
 
       const { data: tarefaMovida } = await api.put(`/tarefas/${id}`, payloadMovimentacao);
@@ -158,7 +159,9 @@ function TarefaV1() {
         )
       );
     } catch (e) {
-      setErro('Erro ao mover tarefa. Tente novamente.');
+      // Captura a mensagem de limite de tarefas retornada pela API
+      const mensagemApi = e.response?.data?.erro?.mensagem || 'Erro ao mover tarefa. Tente novamente.';
+      setErro(mensagemApi);
       console.error('Detalhes do erro:', e.response?.data || e.message);
     }
   }
@@ -233,7 +236,7 @@ function TarefaV1() {
         </select>
       </div>
 
-      {!carregando && !erro && (
+      {!carregando && (
         <>
           <div className="kanban-quadro">
             {/* COLUNA: A FAZER */}
