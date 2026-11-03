@@ -25,6 +25,8 @@
 
   box-shadow:
     15px 0 40px rgba(0, 0, 0, 0.15);
+
+  z-index: 50;
 }
 
 
@@ -45,6 +47,7 @@
 
   font-size: 36px;
   font-weight: 800;
+  margin: 0;
 }
 
 

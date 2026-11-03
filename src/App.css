@@ -260,6 +260,38 @@ footer {
 }
 
 
+/* ── BOTÃO DE ADICIONAR TAREFA NA COLUNA ───────────────── */
+
+.kanban-btn-add {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 28px;
+  height: 28px;
+
+  background: rgba(139, 92, 246, 0.2);
+  color: var(--primary-light);
+
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  border-radius: 8px;
+
+  font-size: 1.1rem;
+  line-height: 1;
+
+  cursor: pointer;
+
+  transition: 0.2s ease;
+}
+
+.kanban-btn-add:hover {
+  background: var(--primary);
+  color: #ffffff;
+
+  transform: scale(1.05);
+}
+
+
 /* ── LISTA ─────────────────────────────────────────────── */
 
 .kanban-lista {
