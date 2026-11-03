@@ -123,24 +123,40 @@ function TarefaV1() {
 
   async function moverTarefa(id, novaColuna) {
     try {
+      setErro('');
       const tarefaAtual = tarefas.find((t) => t.id === id);
       if (!tarefaAtual) return;
 
-      const payloadAtualizado = { 
-        ...tarefaAtual, 
+      const idPrioridadeNum = Number(
+        tarefaAtual.idprioridade ?? 
+        tarefaAtual.idPrioridade ?? 
+        tarefaAtual.prioridade_id ?? 
+        1
+      );
+
+      const payloadAtualizado = {
+        ...tarefaAtual,
         coluna: novaColuna,
-        usuarioId: tarefaAtual.usuarioId || tarefaAtual.usuario_id || 1,
-        projetoId: tarefaAtual.projetoId || tarefaAtual.projeto_id || 1
+        idprioridade: idPrioridadeNum,
+        idPrioridade: idPrioridadeNum,
+        prioridade_id: idPrioridadeNum,
+        usuarioId: Number(tarefaAtual.usuarioId ?? tarefaAtual.usuario_id ?? 1),
+        usuario_id: Number(tarefaAtual.usuario_id ?? tarefaAtual.usuarioId ?? 1),
+        projetoId: Number(tarefaAtual.projetoId ?? tarefaAtual.projeto_id ?? 1),
+        projeto_id: Number(tarefaAtual.projeto_id ?? tarefaAtual.projetoId ?? 1),
+        texto: tarefaAtual.texto || tarefaAtual.descricao || ''
       };
 
       const { data: tarefaMovida } = await api.put(`/tarefas/${id}`, payloadAtualizado);
 
       setTarefas((tarefasAtuais) =>
-        tarefasAtuais.map((t) => (t.id === id ? { ...payloadAtualizado, ...tarefaMovida } : t))
+        tarefasAtuais.map((t) =>
+          t.id === id ? { ...payloadAtualizado, ...tarefaMovida } : t
+        )
       );
     } catch (e) {
       setErro('Erro ao mover tarefa. Tente novamente.');
-      console.error(e);
+      console.error('Erro detalhado da API ao mover:', e.response?.data || e.message);
     }
   }
 
