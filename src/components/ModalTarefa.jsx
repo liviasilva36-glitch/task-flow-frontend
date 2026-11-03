@@ -1,12 +1,11 @@
 import { useEffect, useState } from "react";
-// Importação com extensão .js explícita para evitar erros de resolução do Vite
 import { mensagensDeErro } from "../pages/api.js";
 import { useAuth } from "../contexts/AuthContext";
 import styles from "./ModalTarefa.module.css";
 
-// Função para converter valor do select para número ou null se vazio
+// Função utilitária para converter valor para número ou null se estiver vazio
 function paraNumero(valor) {
-  return valor ? Number(valor) : null;
+  return valor !== null && valor !== undefined && valor !== "" ? Number(valor) : null;
 }
 
 function ModalTarefa({
@@ -22,18 +21,25 @@ function ModalTarefa({
   const { usuario } = useAuth();
 
   const [texto, setTexto] = useState("");
-  const [idPrioridade, setIdPrioridade] = useState(2); // ID padrão
+  const [idPrioridade, setIdPrioridade] = useState("2");
   const [idUsuario, setIdUsuario] = useState("");
   const [idProjeto, setIdProjeto] = useState("");
   const [erros, setErros] = useState([]);
   const [salvando, setSalvando] = useState(false);
 
-  // Filtra apenas os projetos pertencentes ao responsável selecionado
+  // Filtra projetos pertencentes ao responsável selecionado
   const projetosDoUsuario = projetos.filter(
-    (p) => Number(p.usuario_id || p.usuarioId) === Number(idUsuario),
+    (p) => Number(p.usuario_id || p.usuarioId) === Number(idUsuario)
   );
 
-  // Preenche os campos SOMENTE quando o modal é aberto ou quando a tarefa selecionada muda
+  // Lista unificada de prioridades (garante fallback caso venha vazia do backend)
+  const listaPrioridades = prioridades.length > 0 ? prioridades : [
+    { id: 1, nome: "baixa", descricao: "Baixa" },
+    { id: 2, nome: "media", descricao: "Média" },
+    { id: 3, nome: "alta", descricao: "Alta" }
+  ];
+
+  // Atualiza os campos sempre que o modal abre ou os dados mudam
   useEffect(() => {
     if (!aberto) return;
 
@@ -41,63 +47,91 @@ function ModalTarefa({
 
     if (tarefa) {
       setTexto(tarefa.texto || tarefa.descricao || "");
-      setIdPrioridade(
-        tarefa.idprioridade ?? tarefa.idPrioridade ?? tarefa.prioridade_id ?? 2,
-      );
-      setIdUsuario(tarefa.usuarioId ?? tarefa.usuario_id ?? "");
-      setIdProjeto(tarefa.projetoId ?? tarefa.projeto_id ?? "");
+      
+      const idPri = tarefa.idprioridade ?? tarefa.idPrioridade ?? tarefa.prioridade_id ?? 2;
+      setIdPrioridade(String(idPri));
+
+      const usrId = tarefa.usuarioId ?? tarefa.usuario_id ?? (usuario?.id || usuarios[0]?.id || "");
+      setIdUsuario(String(usrId));
+
+      const projId = tarefa.projetoId ?? tarefa.projeto_id ?? "";
+      setIdProjeto(String(projId));
     } else {
       const usuarioPadrao = usuario?.id || usuarios[0]?.id || "";
-      const prioridadePadrao = prioridades[0]?.id || 2;
+      const prioridadePadrao = listaPrioridades[0]?.id ? String(listaPrioridades[0].id) : "2";
 
       setTexto("");
       setIdPrioridade(prioridadePadrao);
-      setIdUsuario(usuarioPadrao);
+      setIdUsuario(String(usuarioPadrao));
 
-      // Define o primeiro projeto do responsável selecionado por padrão
-      const projetosFiltrados = projetos.filter(
-        (p) => Number(p.usuario_id || p.usuarioId) === Number(usuarioPadrao),
+      const projsIniciais = projetos.filter(
+        (p) => Number(p.usuario_id || p.usuarioId) === Number(usuarioPadrao)
       );
-      setIdProjeto(projetosFiltrados[0]?.id || projetos[0]?.id || "");
+      setIdProjeto(projsIniciais[0]?.id ? String(projsIniciais[0].id) : "");
     }
-  }, [aberto, tarefa?.id]);
+  }, [aberto, tarefa, prioridades, usuario, usuarios, projetos]);
 
-  // Quando o usuário muda o responsável no select, ajusta o projeto selecionado
+  // Ajusta o projeto selecionado quando o responsável muda
   function handleUsuarioChange(novoIdUsuario) {
     setIdUsuario(novoIdUsuario);
     const projetosFiltrados = projetos.filter(
-      (p) => Number(p.usuario_id || p.usuarioId) === Number(novoIdUsuario),
+      (p) => Number(p.usuario_id || p.usuarioId) === Number(novoIdUsuario)
     );
-    setIdProjeto(projetosFiltrados[0]?.id || "");
+    setIdProjeto(projetosFiltrados[0]?.id ? String(projetosFiltrados[0].id) : "");
   }
 
-  // Função para guardar/enviar a tarefa para a API
+  // Submissão e validação
   async function handleSalvar() {
     setErros([]);
+    
+    if (!texto.trim()) {
+      setErros(["O texto da tarefa não pode estar vazio."]);
+      return;
+    }
+
+    const projetoIdCalculado = paraNumero(idProjeto) || 
+      (projetosDoUsuario.length > 0 ? Number(projetosDoUsuario[0].id) : null);
+
+    if (!projetoIdCalculado) {
+      setErros(["Selecione um projeto válido antes de salvar."]);
+      return;
+    }
+
     setSalvando(true);
 
     try {
-      const prioridadeIdNum = paraNumero(idPrioridade) || 2;
+      const prioridadeIdNum = Number(idPrioridade) || 2;
 
-      // Busca o objeto de prioridade selecionado na lista recebida por props
-      const objPrioridade = prioridades.find(
-        (p) => Number(p.id) === Number(prioridadeIdNum),
+      // Localiza o objeto de prioridade na lista unificada
+      const objPrioridade = listaPrioridades.find(
+        (p) => Number(p.id || p.idprioridade) === prioridadeIdNum
       );
 
-      // Obtém o nome real da prioridade dinamicamente (ex: 'baixa', 'media', 'alta')
-      const prioridadeTexto = objPrioridade
+      let prioridadeTexto = objPrioridade
         ? objPrioridade.nome || objPrioridade.descricao
-        : "media";
+        : null;
 
-      // Monta o payload no formato exigido pela API
+      if (!prioridadeTexto) {
+        if (prioridadeIdNum === 1) prioridadeTexto = "baixa";
+        else if (prioridadeIdNum === 3) prioridadeTexto = "alta";
+        else prioridadeTexto = "media";
+      }
+
+      const textoPrioridadeBaixa = String(prioridadeTexto).toLowerCase();
+
+      // Payload completo para suportar diferentes estruturas de API
       const payload = {
         texto: texto.trim(),
         coluna: tarefa?.coluna || coluna || "afazer",
-        prioridade: String(prioridadeTexto).toLowerCase(),
+        prioridade: textoPrioridadeBaixa,
+        idPrioridade: prioridadeIdNum,
         idprioridade: prioridadeIdNum,
-        usuarioId:
-          paraNumero(idUsuario) || (usuario?.id ? Number(usuario.id) : 1),
-        projetoId: paraNumero(idProjeto) || 1,
+        prioridade_id: prioridadeIdNum,
+        id_prioridade: prioridadeIdNum,
+        usuarioId: paraNumero(idUsuario) || (usuario?.id ? Number(usuario.id) : 1),
+        usuario_id: paraNumero(idUsuario) || (usuario?.id ? Number(usuario.id) : 1),
+        projetoId: projetoIdCalculado,
+        projeto_id: projetoIdCalculado,
       };
 
       if (tarefa?.id) {
@@ -105,8 +139,7 @@ function ModalTarefa({
       }
 
       await onSalvar(payload);
-
-      onFechar(); // Só fecha o modal se a requisição for bem-sucedida
+      onFechar();
     } catch (e) {
       setErros(mensagensDeErro(e));
     } finally {
@@ -139,7 +172,7 @@ function ModalTarefa({
             onChange={(e) => handleUsuarioChange(e.target.value)}
           >
             {usuarios.map((u) => (
-              <option key={u.id} value={u.id}>
+              <option key={u.id} value={String(u.id)}>
                 {u.nome}
               </option>
             ))}
@@ -155,7 +188,7 @@ function ModalTarefa({
           >
             {projetosDoUsuario.length > 0 ? (
               projetosDoUsuario.map((p) => (
-                <option key={p.id} value={p.id}>
+                <option key={p.id} value={String(p.id)}>
                   {p.nome}
                 </option>
               ))
@@ -171,22 +204,14 @@ function ModalTarefa({
           <label htmlFor="tarefa-prioridade">Prioridade</label>
           <select
             id="tarefa-prioridade"
-            value={idPrioridade}
+            value={String(idPrioridade)}
             onChange={(e) => setIdPrioridade(e.target.value)}
           >
-            {prioridades.length > 0 ? (
-              prioridades.map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.nome || p.descricao}
-                </option>
-              ))
-            ) : (
-              <>
-                <option value={1}>Baixa</option>
-                <option value={2}>Média</option>
-                <option value={3}>Alta</option>
-              </>
-            )}
+            {listaPrioridades.map((p) => (
+              <option key={p.id} value={String(p.id)}>
+                {p.descricao || p.nome}
+              </option>
+            ))}
           </select>
         </div>
 

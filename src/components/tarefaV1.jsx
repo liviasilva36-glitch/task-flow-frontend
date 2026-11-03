@@ -1,4 +1,3 @@
-
 // =============================================================
 // IMPORTS
 // =============================================================
@@ -103,7 +102,7 @@ function TarefaV1() {
       setModalAberto(false);
     } catch (e) {
       console.error(e);
-      throw e; // Lança a exceção para que o ModalTarefa exiba as validações no ecrã
+      throw e;
     }
   }
 
@@ -144,15 +143,40 @@ function TarefaV1() {
   }
 
   // =============================================================
-  // 5. FILTROS E ORDENAÇÃO
+  // 5. HELPER DE EXTRAÇÃO E FILTROS DE PRIORIDADE
   // =============================================================
 
-  const tarefasFiltradas = tarefas.filter((tarefa) => {
+  function obterNomePrioridade(tarefa) {
+    if (typeof tarefa.prioridade === 'string') {
+      return tarefa.prioridade.toLowerCase();
+    }
+    if (tarefa.prioridade?.nome) {
+      return String(tarefa.prioridade.nome).toLowerCase();
+    }
+    
+    const idPri = Number(tarefa.idprioridade ?? tarefa.idPrioridade ?? tarefa.prioridade_id);
+    if (idPri === 3) return 'alta';
+    if (idPri === 2) return 'media';
+    if (idPri === 1) return 'baixa';
+
+    const priEncontrada = prioridades.find((p) => Number(p.id) === idPri);
+    if (priEncontrada) {
+      return String(priEncontrada.nome || priEncontrada.descricao).toLowerCase();
+    }
+
+    return 'baixa';
+  }
+
+  const tarefasNormalizadas = tarefas.map((t) => ({
+    ...t,
+    prioridade: obterNomePrioridade(t),
+  }));
+
+  const tarefasFiltradas = tarefasNormalizadas.filter((tarefa) => {
     if (filtroPrioridade === 'todas') return true;
-    return tarefa.prioridade === filtroPrioridade;
+    return tarefa.prioridade === filtroPrioridade.toLowerCase();
   });
 
-  // DESAFIO 4: Ordena os cartões pela propriedade 'ordem'
   const tarefasOrdenadas = [...tarefasFiltradas].sort(
     (a, b) => (a.ordem ?? 0) - (b.ordem ?? 0)
   );
@@ -210,6 +234,7 @@ function TarefaV1() {
                 <ListaTarefas
                   tarefas={tarefasOrdenadas.filter((t) => t.coluna === 'afazer')}
                   usuarios={usuarios}
+                  prioridades={prioridades}
                   onDeletar={deletarTarefa}
                   onEditar={abrirModalEditar}
                   onMover={moverTarefa}
@@ -235,6 +260,7 @@ function TarefaV1() {
                 <ListaTarefas
                   tarefas={tarefasOrdenadas.filter((t) => t.coluna === 'andamento')}
                   usuarios={usuarios}
+                  prioridades={prioridades}
                   onDeletar={deletarTarefa}
                   onEditar={abrirModalEditar}
                   onMover={moverTarefa}
@@ -260,6 +286,7 @@ function TarefaV1() {
                 <ListaTarefas
                   tarefas={tarefasOrdenadas.filter((t) => t.coluna === 'concluido')}
                   usuarios={usuarios}
+                  prioridades={prioridades}
                   onDeletar={deletarTarefa}
                   onEditar={abrirModalEditar}
                   onMover={moverTarefa}

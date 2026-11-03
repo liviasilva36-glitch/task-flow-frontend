@@ -1,4 +1,3 @@
-
 import TarefaItem from './TarefaItem';
 
 function ListaTarefas({ 
@@ -23,15 +22,30 @@ function ListaTarefas({
       {tarefas.length > 0 && (
         <ul id='lista-tarefas' style={{ listStyle: 'none', padding: 0, margin: 0 }}>
           {tarefas.map(tarefa => {
-            // Busca a prioridade correspondente na lista pelo ID
+            const idPri = Number(tarefa.idprioridade ?? tarefa.prioridade_id ?? tarefa.idPrioridade);
+
+            // 1. Tenta buscar na lista de prioridades recebida da API
             const prioridadeObj = prioridades.find(
-              (p) => Number(p.id) === Number(tarefa.idprioridade ?? tarefa.prioridade_id ?? tarefa.idPrioridade)
+              (p) => Number(p.id) === idPri
             );
 
-            // Determina a string da prioridade (ex: 'alta', 'baixa', 'media')
-            const valorPrioridade = prioridadeObj 
-              ? (prioridadeObj.nome || prioridadeObj.descricao) 
-              : (tarefa.prioridade || 'media');
+            // 2. Determina a string correta da prioridade (ex: 'alta', 'baixa', 'media')
+            let valorPrioridade = prioridadeObj 
+              ? (prioridadeObj.nome || prioridadeObj.descricao)
+              : null;
+
+            // 3. Fallbacks de resgate caso a prop 'prioridades' não venha preenchida
+            if (!valorPrioridade) {
+              if (typeof tarefa.prioridade === 'string' && tarefa.prioridade.trim() !== '') {
+                valorPrioridade = tarefa.prioridade;
+              } else if (idPri === 1) {
+                valorPrioridade = 'baixa';
+              } else if (idPri === 3) {
+                valorPrioridade = 'alta';
+              } else {
+                valorPrioridade = 'media';
+              }
+            }
 
             return (
               <TarefaItem
@@ -40,7 +54,7 @@ function ListaTarefas({
                 usuarios={usuarios} 
                 texto={tarefa.texto || tarefa.descricao}
                 cidade={tarefa.cidade}
-                prioridade={valorPrioridade}
+                prioridade={String(valorPrioridade).toLowerCase()}
                 coluna={tarefa.coluna}
                 onDeletar={() => onDeletar(tarefa.id)}
                 onEditar={onEditar ? () => onEditar(tarefa) : undefined}
