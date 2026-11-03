@@ -138,9 +138,9 @@ function TarefaV1() {
       const usuarioIdNum = Number(tarefaAtual.usuarioId ?? tarefaAtual.usuario_id ?? 1);
       const projetoIdNum = Number(tarefaAtual.projetoId ?? tarefaAtual.projeto_id ?? 1);
 
+      // Payload padronizado para a API do Vercel
       const payloadMovimentacao = {
         coluna: novaColuna,
-        status: novaColuna,
         texto: textoFinal,
         descricao: textoFinal,
         idprioridade: idPrioridadeNum,
@@ -148,22 +148,7 @@ function TarefaV1() {
         projeto_id: projetoIdNum
       };
 
-      let tarefaMovida;
-
-      try {
-        const resposta = await api.put(`/tarefas/${id}`, payloadMovimentacao);
-        tarefaMovida = resposta.data;
-      } catch (errPrimario) {
-        if (errPrimario.response?.status === 409) {
-          const respostaFallback = await api.put(`/tarefas/${id}`, {
-            coluna: novaColuna,
-            status: novaColuna
-          });
-          tarefaMovida = respostaFallback.data;
-        } else {
-          throw errPrimario;
-        }
-      }
+      const { data: tarefaMovida } = await api.put(`/tarefas/${id}`, payloadMovimentacao);
 
       setTarefas((tarefasAtuais) =>
         tarefasAtuais.map((t) =>
@@ -174,7 +159,7 @@ function TarefaV1() {
       );
     } catch (e) {
       setErro('Erro ao mover tarefa. Tente novamente.');
-      console.error('Resposta da API:', e.response?.data || e.message);
+      console.error('Detalhes do erro:', e.response?.data || e.message);
     }
   }
 
