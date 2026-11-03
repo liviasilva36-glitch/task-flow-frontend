@@ -13,6 +13,8 @@
   backdrop-filter: blur(5px);
 
   z-index: 100;
+
+  animation: fadeIn 0.2s ease-out forwards;
 }
 
 
@@ -35,6 +37,8 @@
   border-radius: 14px;
 
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+
+  animation: scaleUp 0.2s ease-out forwards;
 }
 
 
@@ -44,6 +48,7 @@
   color: #a78bfa;
 
   font-size: 1.2rem;
+  margin: 0;
 }
 
 
@@ -78,6 +83,8 @@
   font-size: 1rem;
 
   outline: none;
+
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 
@@ -112,6 +119,7 @@
   display: flex;
   flex-direction: column;
   gap: 4px;
+  margin: 0;
 }
 
 
@@ -121,6 +129,7 @@
   display: flex;
   justify-content: flex-end;
   gap: 10px;
+  margin-top: 6px;
 }
 
 /* Botão desabilitado */
@@ -172,4 +181,27 @@
 
 .botoes button:last-child:hover {
   background-color: #6d28d9;
+}
+
+
+/* ── ANIMAÇÕES (INCLUSÃO) ──────────────────────────────── */
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes scaleUp {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }

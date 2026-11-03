@@ -1,35 +1,3 @@
-/* /* ── TAREFA ──────────────────────────────────────────────
-
-.tarefa {
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  gap: 10px;
-
-  min-width: 0;
-
-  margin-bottom: 8px;
-  padding: 12px 18px;
-
-  background-color: #334155;
-  color: #f8fafc;
-
-  border: 1px solid #475569;
-  border-radius: 10px;
-
-  list-style: none;
-
-  transition:
-    transform 0.2s ease,
-    border-color 0.2s ease;
-}
-
-.tarefa:hover {
-  border-color: #64748b;
-  transform: translateY(-1px);
-}
-
-
 /* ── CONTEÚDO ──────────────────────────────────────────── */
 
 .conteudo {
@@ -86,6 +54,10 @@
   font-weight: 600;
 
   letter-spacing: 0.05em;
+
+  /* Adicionado para manter a badge compacta no card */
+  align-self: flex-start;
+  width: fit-content;
 }
 
 
@@ -105,7 +77,6 @@
 
   transition: 0.2s;
 }
-
 
 
 /* ── HOVER DOS BOTÕES ──────────────────────────────────── */
@@ -175,21 +146,65 @@
 .badge-baixa {
   background-color: #22c55e;
   color: #052e16;
-}  
+}
 
-/* ── BADGE DE PRIORIDADE ───────────────────────────────── */
 
-.badge-prioridade {
-  padding: 4px 10px;
+/* ── ESTILOS COMPLEMENTARES E MODERNIZAÇÃO (INCLUSÃO) ──── */
 
+.cartao {
+  background-color: #1e293b;
+  border: 1px solid #334155;
   border-radius: 12px;
+  padding: 14px 16px;
+  margin-bottom: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2), 0 2px 4px -2px rgba(0, 0, 0, 0.2);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  list-style: none;
+}
 
-  font-size: 12px;
-  font-weight: 600;
+.cartao:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+}
 
-  letter-spacing: 0.05em;
+.cabecalhoCartao {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
 
-  /* Adicionado para manter a badge compacta no card */
-  align-self: flex-start;
-  width: fit-content;
+.btnIcone {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 0.9rem;
+  opacity: 0.7;
+  padding: 2px 4px;
+  transition: opacity 0.2s, transform 0.1s;
+}
+
+.btnIcone:hover {
+  opacity: 1;
+  transform: scale(1.15);
+}
+
+.rodapeCartao {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding-top: 8px;
+  margin-top: 10px;
+}
+
+.btnAvancar {
+  background-color: rgba(99, 102, 241, 0.2);
+  color: #a5b4fc;
+  border-color: #6366f1;
+}
+
+.btnAvancar:hover {
+  background-color: #6366f1;
+  color: #ffffff;
 }
