@@ -1,9 +1,12 @@
 import styles from './TarefaItem.module.css';
 
 function TarefaItem({
+  id,
   texto, 
   concluida = false, 
-  prioridade = 'media', 
+  prioridade = 'baixa', 
+  prioridades = null,
+  prioridade_id = null,
   cidade = "",
   onDeletar, 
   onEditar, 
@@ -12,42 +15,67 @@ function TarefaItem({
   colunaProxima    = null,
 }) {
 
-  // Normaliza o nome da prioridade para evitar erros de leitura no CSS
-  const valorPrioridade = typeof prioridade === 'object' 
-  ? (prioridade?.nome || prioridade?.descricao || 'media')
-  : (prioridade || 'media');
+  // Mapeamento de IDs padrão da tabela prioridades
+  const mapaPrioridadesPorId = {
+    1: 'baixa',
+    2: 'media',
+    3: 'alta'
+  };
 
-  // Define as classes do container li
+  // 1. Extração dinâmica da prioridade
+  let valorPrioridade = null;
+
+  const objPrioridade = (typeof prioridade === 'object' ? prioridade : null) || prioridades;
+  if (objPrioridade && typeof objPrioridade === 'object') {
+    valorPrioridade = objPrioridade.nome || objPrioridade.descricao;
+  }
+
+  if (!valorPrioridade && typeof prioridade === 'string' && isNaN(Number(prioridade))) {
+    valorPrioridade = prioridade;
+  }
+
+  const idNumerico = Number(
+    (!isNaN(Number(prioridade)) ? prioridade : null) ?? 
+    prioridade_id ?? 
+    objPrioridade?.id
+  );
+
+  if (!valorPrioridade && idNumerico && mapaPrioridadesPorId[idNumerico]) {
+    valorPrioridade = mapaPrioridadesPorId[idNumerico];
+  }
+
+  if (!valorPrioridade) {
+    valorPrioridade = 'baixa';
+  }
+
+  // 2. Normalização para o CSS
   const prioridadeClean = String(valorPrioridade)
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .toLowerCase();
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .trim();
 
-
-    const rótulosPrioridade = {
+  const rotulosPrioridade = {
     alta: 'Alta',
     media: 'Média',
     baixa: 'Baixa'
   };
 
-  const textoExibicao = rótulosPrioridade[prioridadeClean] || prioridadeClean;
+  const textoExibicao = rotulosPrioridade[prioridadeClean] || prioridadeClean;
 
-
-  // Define as classes do texto principal
   const classeItem = [
     styles.tarefa,
     concluida ? styles.concluida : '',
     styles[prioridadeClean] || ''
   ].filter(Boolean).join(' ');
 
-  // Define as classes da badge de prioridade
-const classeTexto = concluida 
+  const classeTexto = concluida 
     ? `${styles.textoTarefa} ${styles['texto-tarefa'] || ''}`.trim()
     : styles.textoTarefa;
 
-     const classePrioridade = `${styles['badge-prioridade'] || ''} ${styles['badge-' + prioridadeClean] || ''}`.trim();
+  const classePrioridade = `${styles['badge-prioridade'] || ''} ${styles['badge-' + prioridadeClean] || ''}`.trim();
 
-    const modoKanban = onMover !== null;
+  const modoKanban = onMover !== null;
 
   return (
     <li className={classeItem} onDoubleClick={onEditar}>
@@ -56,14 +84,14 @@ const classeTexto = concluida
         {cidade && <span className={styles.cidade}>{cidade}</span>}
       </div>
 
-      <span className={classePrioridade}>{prioridadeClean}</span>
-       
+      <span className={classePrioridade}>{textoExibicao}</span>
+        
       <div className={styles.acoes}>
         {modoKanban && colunaAnterior && (
           <button
             type="button"
             className={styles.btnMover}
-            onClick={e => { e.stopPropagation(); onMover(colunaAnterior); }}
+            onClick={e => { e.stopPropagation(); onMover(id, colunaAnterior); }}
             title="Mover para coluna anterior"
           >
             ←
@@ -74,7 +102,7 @@ const classeTexto = concluida
           <button
             type="button"
             className={styles.btnMover}
-            onClick={e => { e.stopPropagation(); onMover(colunaProxima); }}
+            onClick={e => { e.stopPropagation(); onMover(id, colunaProxima); }}
             title="Mover para próxima coluna"
           >
             →

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import api, { mensagensDeErro } from "../api";
 import ListaTarefas from "../components/ListaTarefas";
@@ -53,7 +52,7 @@ function Kanban() {
     setTarefas(respTarefas.data);
   }
 
-  // Suporta receber o objeto tarefa ou id direto
+  // Mover tarefa simplificado (envia apenas a coluna e o texto para evitar falhas de FK)
   async function moverTarefa(tarefaOuId, novaColuna) {
     try {
       const tarefa = typeof tarefaOuId === 'object' 
@@ -62,14 +61,16 @@ function Kanban() {
 
       if (!tarefa) return;
 
-      const resposta = await api.put(`/tarefas/${tarefa.id}`, {
-        ...tarefa,
+      const payload = {
+        texto: tarefa.texto || "Sem título",
         coluna: novaColuna,
-      });
+        status: novaColuna,
+      };
 
-      setTarefas((prev) =>
-        prev.map((t) => (t.id === tarefa.id ? resposta.data : t))
-      );
+      await api.put(`/tarefas/${tarefa.id}`, payload);
+
+      const respTarefas = await api.get("/tarefas");
+      setTarefas(respTarefas.data);
     } catch (e) {
       alert(mensagensDeErro(e).join("\n"));
     }
