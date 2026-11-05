@@ -1,54 +1,59 @@
-import styles from './TarefaItem.module.css';
+
+import styles from "./TarefaItem.module.css";
 
 function TarefaItem({
   id,
-  texto, 
-  concluida = false, 
-  prioridade = 'baixa', 
+  texto,
+  concluida = false,
+  prioridade = "baixa",
   prioridades = null,
   prioridade_id = null,
   cidade = "",
-  onDeletar, 
-  onEditar, 
-  onMover          = null,
-  colunaAnterior   = null,
-  colunaProxima    = null,
+  onDeletar,
+  onEditar,
+  onMover = null,
+  colunaAnterior = null,
+  colunaProxima = null,
 }) {
-
-  // Mapeamento de IDs padrão da tabela prioridades
   const mapaPrioridadesPorId = {
-    1: 'baixa',
-    2: 'media',
-    3: 'alta'
+    1: "baixa",
+    2: "media",
+    3: "alta",
   };
 
-  // 1. Extração dinâmica da prioridade
   let valorPrioridade = null;
 
-  const objPrioridade = (typeof prioridade === 'object' ? prioridade : null) || prioridades;
-  if (objPrioridade && typeof objPrioridade === 'object') {
-    valorPrioridade = objPrioridade.nome || objPrioridade.descricao;
+  const objPrioridade =
+    (typeof prioridade === "object" ? prioridade : null) ||
+    prioridades;
+
+  if (objPrioridade && typeof objPrioridade === "object") {
+    valorPrioridade =
+      objPrioridade.nome || objPrioridade.descricao;
   }
 
-  if (!valorPrioridade && typeof prioridade === 'string' && isNaN(Number(prioridade))) {
+  if (
+    !valorPrioridade &&
+    typeof prioridade === "string" &&
+    isNaN(Number(prioridade))
+  ) {
     valorPrioridade = prioridade;
   }
 
   const idNumerico = Number(
-    (!isNaN(Number(prioridade)) ? prioridade : null) ?? 
-    prioridade_id ?? 
-    objPrioridade?.id
+    (!isNaN(Number(prioridade)) ? prioridade : null) ??
+      prioridade_id ??
+      objPrioridade?.id
   );
 
-  if (!valorPrioridade && idNumerico && mapaPrioridadesPorId[idNumerico]) {
+  if (!valorPrioridade && idNumerico) {
     valorPrioridade = mapaPrioridadesPorId[idNumerico];
   }
 
   if (!valorPrioridade) {
-    valorPrioridade = 'baixa';
+    valorPrioridade = "baixa";
   }
 
-  // 2. Normalização para o CSS
   const prioridadeClean = String(valorPrioridade)
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
@@ -56,41 +61,54 @@ function TarefaItem({
     .trim();
 
   const rotulosPrioridade = {
-    alta: 'Alta',
-    media: 'Média',
-    baixa: 'Baixa'
+    alta: "Alta",
+    media: "Média",
+    baixa: "Baixa",
   };
 
-  const textoExibicao = rotulosPrioridade[prioridadeClean] || prioridadeClean;
+  const textoExibicao =
+    rotulosPrioridade[prioridadeClean] || prioridadeClean;
 
   const classeItem = [
     styles.tarefa,
-    concluida ? styles.concluida : '',
-    styles[prioridadeClean] || ''
-  ].filter(Boolean).join(' ');  
-  const classeTexto = concluida 
-    ? `${styles.textoTarefa} ${styles['texto-tarefa'] || ''}`.trim()
-    : styles.textoTarefa;
+    concluida ? styles.concluida : "",
+    styles[prioridadeClean] || "",
+  ]
+    .filter(Boolean)
+    .join(" ");
 
-  const classePrioridade = `${styles['badge-prioridade'] || ''} ${styles['badge-' + prioridadeClean] || ''}`.trim();
+  const classePrioridade = [
+    styles.badgePrioridade,
+    styles["badge-" + prioridadeClean],
+  ]
+    .filter(Boolean)
+    .join(" ");
 
   const modoKanban = onMover !== null;
 
   return (
-    <li className={classeItem} onDoubleClick={onEditar}>
+    <li className={classeItem}>
       <div className={styles.conteudo}>
-        <span className={classeTexto}>{texto}</span>
-        {cidade && <span className={styles.cidade}>{cidade}</span>}
+        <span className={styles.textoTarefa}>{texto}</span>
+
+        {cidade && (
+          <span className={styles.cidade}>{cidade}</span>
+        )}
       </div>
 
-      <span className={classePrioridade}>{textoExibicao}</span>
-        
+      <span className={classePrioridade}>
+        {textoExibicao}
+      </span>
+
       <div className={styles.acoes}>
         {modoKanban && colunaAnterior && (
           <button
             type="button"
             className={styles.btnMover}
-            onClick={e => { e.stopPropagation(); onMover(id, colunaAnterior); }}
+            onClick={(e) => {
+              e.stopPropagation();
+              onMover(id, colunaAnterior);
+            }}
             title="Mover para coluna anterior"
           >
             ←
@@ -101,22 +119,47 @@ function TarefaItem({
           <button
             type="button"
             className={styles.btnMover}
-            onClick={e => { e.stopPropagation(); onMover(id, colunaProxima); }}
+            onClick={(e) => {
+              e.stopPropagation();
+              onMover(id, colunaProxima);
+            }}
             title="Mover para próxima coluna"
           >
             →
           </button>
         )}
 
-        <button 
+        <button
           type="button"
-          className={styles.btnDeletar} 
-          onClick={e => { e.stopPropagation(); onDeletar(); }}
+          className={styles.btnDeletar}
+          onClick={(e) => {
+            e.stopPropagation();
+            onDeletar();
+          }}
           title="Excluir tarefa"
         >
           X
         </button>
       </div>
+
+      {onEditar && (
+        <div className={styles.editarOverlay}>
+          <div className={styles.editarMensagem}>
+            <span>Deseja editar esta tarefa?</span>
+
+            <button
+              type="button"
+              className={styles.btnEditar}
+              onClick={(e) => {
+                e.stopPropagation();
+                onEditar();
+              }}
+            >
+              ✎ Editar tarefa
+            </button>
+          </div>
+        </div>
+      )}
     </li>
   );
 }
