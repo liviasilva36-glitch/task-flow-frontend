@@ -67,8 +67,7 @@ function TarefaItem({
     styles.tarefa,
     concluida ? styles.concluida : '',
     styles[prioridadeClean] || ''
-  ].filter(Boolean).join(' ');
-
+  ].filter(Boolean).join(' ');  
   const classeTexto = concluida 
     ? `${styles.textoTarefa} ${styles['texto-tarefa'] || ''}`.trim()
     : styles.textoTarefa;
