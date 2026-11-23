@@ -1,20 +1,199 @@
 
+// import styles from "./TarefaItem.module.css";
+
+// function TarefaItem({
+//   id,
+//   texto,
+//   concluida = false,
+//   prioridade = "baixa",
+//   prioridades = null,
+//   prioridade_id = null,
+//   cidade = "",
+//   onDeletar,
+//   onEditar,
+//   onMover = null,
+//   colunaAnterior = null,
+//   colunaProxima = null,
+// }) {
+//   const mapaPrioridadesPorId = {
+//     1: "baixa",
+//     2: "media",
+//     3: "alta",
+//   };
+
+//   let valorPrioridade = null;
+
+//   const objPrioridade =
+//     (typeof prioridade === "object" ? prioridade : null) ||
+//     prioridades;
+
+//   if (objPrioridade && typeof objPrioridade === "object") {
+//     valorPrioridade =
+//       objPrioridade.nome || objPrioridade.descricao;
+//   }
+
+//   if (
+//     !valorPrioridade &&
+//     typeof prioridade === "string" &&
+//     isNaN(Number(prioridade))
+//   ) {
+//     valorPrioridade = prioridade;
+//   }
+
+//   const idNumerico = Number(
+//     (!isNaN(Number(prioridade)) ? prioridade : null) ??
+//       prioridade_id ??
+//       objPrioridade?.id
+//   );
+
+//   if (!valorPrioridade && idNumerico) {
+//     valorPrioridade = mapaPrioridadesPorId[idNumerico];
+//   }
+
+//   if (!valorPrioridade) {
+//     valorPrioridade = "baixa";
+//   }
+
+//   const prioridadeClean = String(valorPrioridade)
+//     .normalize("NFD")
+//     .replace(/[\u0300-\u036f]/g, "")
+//     .toLowerCase()
+//     .trim();
+
+//   const rotulosPrioridade = {
+//     alta: "Alta",
+//     media: "Média",
+//     baixa: "Baixa",
+//   };
+
+//   const textoExibicao =
+//     rotulosPrioridade[prioridadeClean] || prioridadeClean;
+
+//   const classeItem = [
+//     styles.tarefa,
+//     concluida ? styles.concluida : "",
+//     styles[prioridadeClean] || "",
+//   ]
+//     .filter(Boolean)
+//     .join(" ");
+
+//   const classePrioridade = [
+//     styles.badgePrioridade,
+//     styles["badge-" + prioridadeClean],
+//   ]
+//     .filter(Boolean)
+//     .join(" ");
+
+//   const modoKanban = onMover !== null;
+
+//   return (
+//     <li className={classeItem}>
+//       <div className={styles.conteudo}>
+//         <span className={styles.textoTarefa}>{texto}</span>
+
+//         {cidade && (
+//           <span className={styles.cidade}>{cidade}</span>
+//         )}
+//       </div>
+
+//       <span className={classePrioridade}>
+//         {textoExibicao}
+//       </span>
+
+//       <div className={styles.acoes}>
+//         {modoKanban && colunaAnterior && (
+//           <button
+//             type="button"
+//             className={styles.btnMover}
+//             onClick={(e) => {
+//               e.stopPropagation();
+//               onMover(id, colunaAnterior);
+//             }}
+//             title="Mover para coluna anterior"
+//           >
+//             ←
+//           </button>
+//         )}
+
+//         {modoKanban && colunaProxima && (
+//           <button
+//             type="button"
+//             className={styles.btnMover}
+//             onClick={(e) => {
+//               e.stopPropagation();
+//               onMover(id, colunaProxima);
+//             }}
+//             title="Mover para próxima coluna"
+//           >
+//             →
+//           </button>
+//         )}
+
+//         <button
+//           type="button"
+//           className={styles.btnDeletar}
+//           onClick={(e) => {
+//             e.stopPropagation();
+//             onDeletar();
+//           }}
+//           title="Excluir tarefa"
+//         >
+//           X
+//         </button>
+//       </div>
+
+//       {onEditar && (
+//         <div className={styles.editarOverlay}>
+//           <div className={styles.editarMensagem}>
+//             <span>Deseja editar esta tarefa?</span>
+
+//             <button
+//               type="button"
+//               className={styles.btnEditar}
+//               onClick={(e) => {
+//                 e.stopPropagation();
+//                 onEditar();
+//               }}
+//             >
+//               ✎ Editar tarefa
+//             </button>
+//           </div>
+//         </div>
+//       )}
+//     </li>
+//   );
+// }
+
+// export default TarefaItem;
+
+
+
+
 import styles from "./TarefaItem.module.css";
 
 function TarefaItem({
   id,
+  nome,
   texto,
+  titulo,
+  usuarios,
   concluida = false,
   prioridade = "baixa",
   prioridades = null,
   prioridade_id = null,
   cidade = "",
+  descricao = "",
   onDeletar,
   onEditar,
   onMover = null,
   colunaAnterior = null,
   colunaProxima = null,
 }) {
+  // Resolvendo o nome/título para evitar "undefined"
+  const textoTarefaExibicao = nome || texto || titulo || "Sem título";
+  const descricaoExibicao = descricao || cidade || "";
+  const autorExibicao = usuarios?.nome || "";
+
   const mapaPrioridadesPorId = {
     1: "baixa",
     2: "media",
@@ -24,12 +203,10 @@ function TarefaItem({
   let valorPrioridade = null;
 
   const objPrioridade =
-    (typeof prioridade === "object" ? prioridade : null) ||
-    prioridades;
+    (typeof prioridade === "object" ? prioridade : null) || prioridades;
 
   if (objPrioridade && typeof objPrioridade === "object") {
-    valorPrioridade =
-      objPrioridade.nome || objPrioridade.descricao;
+    valorPrioridade = objPrioridade.nome || objPrioridade.descricao;
   }
 
   if (
@@ -89,10 +266,19 @@ function TarefaItem({
   return (
     <li className={classeItem}>
       <div className={styles.conteudo}>
-        <span className={styles.textoTarefa}>{texto}</span>
+        {/* Renderiza o título corrigido */}
+        <span className={styles.textoTarefa}>{textoTarefaExibicao}</span>
 
-        {cidade && (
-          <span className={styles.cidade}>{cidade}</span>
+        {/* Renderiza o autor caso exista no objeto vindo da API */}
+        {autorExibicao && (
+          <span className={styles.cidade} style={{ color: "#22d3ee", display: "block" }}>
+            👤 {autorExibicao}
+          </span>
+        )}
+
+        {/* Renderiza a descrição/cidade */}
+        {descricaoExibicao && (
+          <span className={styles.cidade}>{descricaoExibicao}</span>
         )}
       </div>
 
