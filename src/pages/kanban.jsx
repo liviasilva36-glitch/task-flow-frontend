@@ -1,6 +1,7 @@
 
 import { useState, useEffect } from "react";
-import api, { mensagensDeErro } from "../api";
+
+import api, { mensagensDeErro } from "./api";
 import ListaTarefas from "../components/ListaTarefas";
 import ModalTarefa from "../components/ModalTarefa";
 import "./Kanban.css";
